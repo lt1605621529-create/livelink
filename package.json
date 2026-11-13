@@ -31,7 +31,7 @@
     "verify:danmu-display": "esbuild scripts/verify-danmu-display.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/verify-danmu-display.cjs --log-level=warning && node node_modules/.cache/verify-danmu-display.cjs",
     "verify:welcome": "esbuild scripts/verify-welcome.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/verify-welcome.cjs --external:electron --log-level=warning && node node_modules/.cache/verify-welcome.cjs",
     "verify:tts": "esbuild scripts/verify-tts-providers.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/verify-tts-providers.cjs --log-level=warning && node node_modules/.cache/verify-tts-providers.cjs",
-    "test": "pnpm verify:tts && pnpm verify:reader && pnpm verify:song && pnpm verify:assets && pnpm verify:ai-reply && pnpm verify:danmu-display && pnpm verify:welcome",
+    "test": "node scripts/run-offline-tests.cjs",
     "verify:tts-settings": "esbuild scripts/verify-tts-settings.ts --bundle --platform=node --format=cjs --external:electron --outfile=node_modules/.cache/verify-tts-settings.cjs --log-level=warning && electron node_modules/.cache/verify-tts-settings.cjs",
     "build:test": "node scripts/build-test.cjs",
     "package:test": "pnpm build:test && electron-builder --win portable nsis --x64 --config electron-builder.test.yml --publish never"
