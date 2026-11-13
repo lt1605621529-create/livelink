@@ -40,7 +40,17 @@ jobs:
       - name: TTS settings persistence and secure storage
         run: pnpm verify:tts-settings
       - name: Package Windows x64
-        run: pnpm exec electron-builder --win ${{ matrix.target }} --x64 --config electron-builder.test.yml --publish never
+        shell: pwsh
+        run: |
+          $output = & pnpm exec electron-builder --win ${{ matrix.target }} --x64 --config electron-builder.test.yml --publish never 2>&1
+          $code = $LASTEXITCODE
+          $output | ForEach-Object { Write-Host $_ }
+          if ($code -ne 0) {
+            $detail = ($output | Select-Object -Last 35) -join "`n"
+            $detail = $detail.Replace('%','%25').Replace("`r",'%0D').Replace("`n",'%0A')
+            Write-Host "::error title=Windows packaging::$detail"
+            exit $code
+          }
       - name: Generate checksums and build identity
         shell: pwsh
         run: |
