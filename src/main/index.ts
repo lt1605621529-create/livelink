@@ -237,6 +237,9 @@ function createWindow(): void {
     }
   })
 
+  if (isTestBuild) {
+    mainWindow.on('page-title-updated', (event) => { event.preventDefault(); mainWindow?.setTitle(applicationName) })
+  }
   mainWindow.on('close', (event) => {
     if (process.platform === 'win32' && tray && !quitting) { event.preventDefault(); mainWindow?.hide() }
   })
