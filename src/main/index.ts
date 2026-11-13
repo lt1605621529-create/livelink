@@ -1,4 +1,5 @@
 import { getTtsKey } from './tts/credentials'
+import { createTray } from './tray'
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'node:path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -36,6 +37,8 @@ const status: { current: ConnectionStatus } = { current: { state: 'idle' } }
 
 // Development never opens the installed application's user data.
 if (!app.isPackaged) app.setPath('userData', join(app.getPath('appData'), 'LiveLink-Development'))
+let quitting = false
+let tray: ReturnType<typeof createTray> | null = null
 
 // ─── 单例服务装配 ─────────────────────────────────────────────
 const config = new AppConfig()
@@ -219,6 +222,7 @@ function createWindow(): void {
     title: 'LiveLink',
     backgroundColor: '#0f172a',
     webPreferences: {
+      backgroundThrottling: false,
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
       contextIsolation: true,
@@ -226,6 +230,9 @@ function createWindow(): void {
     }
   })
 
+  mainWindow.on('close', (event) => {
+    if (process.platform === 'win32' && tray && !quitting) { event.preventDefault(); mainWindow?.hide() }
+  })
   mainWindow.on('ready-to-show', () => mainWindow?.show())
   mainWindow.on('closed', () => {
     // Bug 6 防御：即使 parent 关系出问题，也强制 destroy audioWindow，
@@ -309,6 +316,10 @@ app.whenReady().then(async () => {
   })
 
   createWindow()
+  if (process.platform === 'win32') {
+    try { tray = createTray(() => { mainWindow?.restore(); mainWindow?.show(); mainWindow?.focus() }, () => app.quit()) }
+    catch { console.warn('[main] 托盘创建失败，关闭窗口将退出应用') }
+  }
 
   // 上次会话开着的话，启动时自动恢复（持久化记忆）
   if (config.getDanmuOverlay().enabled) {
@@ -320,9 +331,17 @@ app.whenReady().then(async () => {
   })
 })
 
+app.on('before-quit', (event) => {
+  if (quitting) return
+  event.preventDefault()
+  quitting = true
+  tray?.destroy()
+  void cleanup().finally(() => app.quit())
+})
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    void cleanup().finally(() => app.quit())
+    app.quit()
   }
 })
 
