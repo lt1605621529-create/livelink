@@ -1,5 +1,7 @@
 import { app, BrowserWindow } from 'electron'
-import { resolve } from 'node:path'
+import { resolve, join } from 'node:path'
+import { mkdtempSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import assert from 'node:assert/strict'
 import mitt from 'mitt'
 import { OverlayServer } from '../src/main/overlay-server/server'
@@ -10,6 +12,8 @@ import { createBilibiliRuleHandlers } from '../src/main/platform/bilibili-events
 import { createRule } from '../src/shared/rules'
 import type { StandardEvent } from '../src/main/platform/adapter'
 
+// Chromium can hold cache files until process exit on Windows; keep all of them in OS temp.
+app.setPath('userData', mkdtempSync(join(tmpdir(), 'livelink-rule-overlay-')))
 app.disableHardwareAcceleration()
 const server=new OverlayServer()
 let win:BrowserWindow | undefined
