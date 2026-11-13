@@ -1,0 +1,25 @@
+extends: ./electron-builder.yml
+beforePack: ./scripts/assert-test-build.cjs
+appId: io.jspider.livelink.test
+productName: LiveLink Test
+executableName: LiveLink-Test
+extraMetadata:
+  name: livelink-test
+  livelinkTestBuild: true
+directories:
+  output: out/test-dist
+win:
+  target:
+    - target: portable
+      arch: [x64]
+    - target: nsis
+      arch: [x64]
+portable:
+  artifactName: LiveLink-Test-${version}-${arch}-portable.${ext}
+nsis:
+  artifactName: LiveLink-Test-${version}-${arch}-setup.${ext}
+  shortcutName: LiveLink Test
+  menuCategory: LiveLink Test
+  uninstallDisplayName: LiveLink Test
+  deleteAppDataOnUninstall: false
+publish: null

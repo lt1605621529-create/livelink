@@ -1,0 +1,58 @@
+name: Windows Test Build
+on:
+  workflow_dispatch:
+  push:
+    branches: [build/windows-test]
+permissions:
+  contents: read
+concurrency:
+  group: windows-test-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    name: Windows x64 (${{ matrix.target }})
+    runs-on: windows-2022
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [portable, nsis]
+    env:
+      ELECTRON_MIRROR: https://github.com/electron/electron/releases/download/
+      npm_config_electron_mirror: https://github.com/electron/electron/releases/download/
+      npm_config_electron_builder_binaries_mirror: https://github.com/electron-userland/electron-builder-binaries/releases/download/
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - name: Install pinned pnpm
+        run: npm install --global pnpm@11.25.0
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Type check
+        run: pnpm typecheck
+      - name: Offline regression tests
+        run: pnpm test
+      - name: TTS settings persistence and secure storage
+        run: pnpm verify:tts-settings
+      - name: Build isolated test application
+        run: pnpm build:test
+      - name: Package Windows x64
+        run: pnpm exec electron-builder --win ${{ matrix.target }} --x64 --config electron-builder.test.yml --publish never
+      - name: Generate checksums and build identity
+        shell: pwsh
+        run: |
+          Get-ChildItem out/test-dist/*.exe | Get-FileHash -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  $(Split-Path $_.Path -Leaf)" } | Set-Content out/test-dist/SHA256SUMS.txt
+          "Commit: $env:GITHUB_SHA`nRun: $env:GITHUB_RUN_ID`nTarget: ${{ matrix.target }}`nArch: x64" | Set-Content out/test-dist/BUILD-INFO.txt
+      - name: Upload test package
+        uses: actions/upload-artifact@v4
+        with:
+          name: LiveLink-Test-win-x64-${{ matrix.target }}-${{ github.run_number }}
+          path: |
+            out/test-dist/*.exe
+            out/test-dist/SHA256SUMS.txt
+            out/test-dist/BUILD-INFO.txt
+          if-no-files-found: error
+          retention-days: 14

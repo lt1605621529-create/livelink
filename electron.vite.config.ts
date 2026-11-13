@@ -9,6 +9,7 @@ const pkg = JSON.parse(readFileSync(resolve('package.json'), 'utf-8')) as { vers
 
 export default defineConfig({
   main: {
+    define: { 'process.env.LIVELINK_TEST_BUILD': JSON.stringify(process.env.LIVELINK_TEST_BUILD === '1' ? '1' : '0') },
     plugins: [externalizeDepsPlugin()],
     resolve: {
       alias: {
@@ -51,7 +52,7 @@ export default defineConfig({
     },
     plugins: [vue()],
     define: {
-      __APP_VERSION__: JSON.stringify(pkg.version)
+      __APP_VERSION__: JSON.stringify(pkg.version + (process.env.LIVELINK_TEST_BUILD === '1' ? '-test' : ''))
     },
     build: {
       rollupOptions: {

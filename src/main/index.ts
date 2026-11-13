@@ -35,8 +35,15 @@ import { IpcChannels, type ConnectionStatus } from '../shared/ipc-channels'
 let mainWindow: BrowserWindow | null = null
 const status: { current: ConnectionStatus } = { current: { state: 'idle' } }
 
+const isTestBuild = process.env.LIVELINK_TEST_BUILD === '1'
+const applicationName = isTestBuild ? 'LiveLink Test' : 'LiveLink'
+if (isTestBuild) {
+  app.setName(applicationName)
+  app.setPath('userData', join(app.getPath('appData'), 'LiveLink-Test'))
+}
+
 // Development never opens the installed application's user data.
-if (!app.isPackaged) app.setPath('userData', join(app.getPath('appData'), 'LiveLink-Development'))
+if (!isTestBuild && !app.isPackaged) app.setPath('userData', join(app.getPath('appData'), 'LiveLink-Development'))
 let quitting = false
 let tray: ReturnType<typeof createTray> | null = null
 
@@ -219,7 +226,7 @@ function createWindow(): void {
     minHeight: 600,
     show: false,
     autoHideMenuBar: true,
-    title: 'LiveLink',
+    title: applicationName,
     backgroundColor: '#0f172a',
     webPreferences: {
       backgroundThrottling: false,
@@ -268,7 +275,7 @@ function createWindow(): void {
 }
 
 app.whenReady().then(async () => {
-  electronApp.setAppUserModelId('io.jspider.livelink')
+  electronApp.setAppUserModelId(isTestBuild ? 'io.jspider.livelink.test' : 'io.jspider.livelink')
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
