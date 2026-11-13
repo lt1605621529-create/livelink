@@ -33,12 +33,12 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Type check
         run: pnpm typecheck
+      - name: Build isolated test application
+        run: pnpm build:test
       - name: Offline regression tests
         run: pnpm test
       - name: TTS settings persistence and secure storage
         run: pnpm verify:tts-settings
-      - name: Build isolated test application
-        run: pnpm build:test
       - name: Package Windows x64
         run: pnpm exec electron-builder --win ${{ matrix.target }} --x64 --config electron-builder.test.yml --publish never
       - name: Generate checksums and build identity
