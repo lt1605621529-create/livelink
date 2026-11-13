@@ -573,7 +573,7 @@ export function registerIpcHandlers(deps: IpcDeps): void {
   ipcMain.handle(IpcChannels.RuleList, () => config.getRules())
   ipcMain.handle(IpcChannels.RuleUpsert, (_e, rule: Rule) => {
     const list = config.upsertRule(rule)
-    engine.upsertRule(rule)
+    engine.upsertRule(list.find(saved => saved.id === rule.id)!)
     return list
   })
   ipcMain.handle(IpcChannels.RuleDelete, (_e, id: string) => {

@@ -1,3 +1,4 @@
+import { validateRule } from '../../shared/rules'
 import { encryptApiKey, decryptApiKey } from '../tts/credentials'
 import { CLOUD_DEFAULTS } from '../../shared/tts-providers'
 import { safeStorage } from 'electron'
@@ -294,6 +295,7 @@ export class AppConfig {
     this.store.set('rules', rules)
   }
   upsertRule(rule: Rule): Rule[] {
+    rule = validateRule(rule)
     const list = [...this.getRules()]
     const idx = list.findIndex((r) => r.id === rule.id)
     if (idx >= 0) list[idx] = rule

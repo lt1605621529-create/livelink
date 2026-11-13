@@ -66,34 +66,8 @@ export type EventKind =
   | 'super.chat'
   | 'blindbox.opened'
 
-export type ActionKind = 'tts' | 'overlay' | 'log' | 'query_blindbox' | 'query_wallet'
-
-export interface RuleTemplate {
-  text: string
-}
-
-export interface ActionSpec {
-  kind: ActionKind
-  template?: RuleTemplate
-  overlayPayload?: Record<string, unknown>
-}
-
-export type RuleMatch =
-  | { kind: 'always' }
-  | { kind: 'keyword'; keywords: string[]; mode: 'any' | 'all' }
-  | { kind: 'regex'; pattern: string }
-  | { kind: 'fans_medal'; minLevel: number; requireAnchor: boolean }
-
-export interface Rule {
-  id: string
-  name: string
-  enabled: boolean
-  trigger: EventKind
-  match: RuleMatch
-  cooldownSec: number
-  perUserCooldownSec: number
-  actions: ActionSpec[]
-}
+export type { ActionKind, RuleTemplate, ActionSpec, RuleMatch, Rule } from '../shared/rule-types'
+import type { Rule } from '../shared/rule-types'
 
 export interface TTSConfig extends TTSProviderSettings {
   enabled: boolean

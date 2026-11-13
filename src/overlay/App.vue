@@ -399,6 +399,10 @@ onMounted(() => {
     })
   })
 
+  on<OverlayPayload>('rule.message', (msg) => {
+    if (typeof msg.text === 'string' && msg.text.trim()) pushEnter({ id: uid(), text: msg.text })
+  })
+
   on<OverlayPayload>('viewer.enter', (msg) => {
     const text = msg.text || `欢迎 ${msg.event?.user?.uname ?? '新观众'}`
     pushEnter({ id: uid(), text })

@@ -62,6 +62,7 @@ export class RuleEngine {
   }
 
   private handle(e: StandardEvent): void {
+    if (e.kind === 'room.stats') return
     const now = Date.now()
     for (const rule of this.rules) {
       if (!rule.enabled) continue
@@ -133,6 +134,8 @@ function matches(spec: RuleMatch, e: StandardEvent): boolean {
 function extractText(e: StandardEvent): string | null {
   if (e.kind === 'danmu.received') return e.payload.content
   if (e.kind === 'super.chat') return e.payload.message
+  if (e.kind === 'gift.received' || e.kind === 'guard.bought') return e.payload.giftName
+  if (e.kind === 'blindbox.opened') return `${e.payload.blindBoxName} ${e.payload.rewardGiftName}`
   return null
 }
 
