@@ -29,7 +29,7 @@ https://github.com/lt1605621529-create/livelink/actions/workflows/windows-test.y
 
 ## 构建与验证
 
-Windows CI：Node 24.22.1、pnpm 11.25.0、frozen lockfile；官方 Electron 下载地址。便携和 NSIS 独立矩阵任务，失败互不取消；无 Release 权限，显式 `--publish never`，只上传 Artifacts。
+Windows CI：Node 24.22.1、pnpm 11.25.0、frozen lockfile；官方 Electron 下载地址。打包复用安装阶段已经校验的 `node_modules/electron/dist`，避免 electron-builder 旧下载器对官方版本目录的拼接差异。便携和 NSIS 独立矩阵任务，失败互不取消；无 Release 权限，显式 `--publish never`，只上传 Artifacts。
 
 执行 `pnpm typecheck`、`pnpm test`（336 项离线断言）、`pnpm verify:tts-settings`（实际 Electron 配置保存/重新读取、Windows DPAPI 加密与删除）、`pnpm build:test`，然后分别执行：
 

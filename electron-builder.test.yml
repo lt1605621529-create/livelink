@@ -1,4 +1,5 @@
 extends: ./electron-builder.yml
+electronDist: node_modules/electron/dist
 beforePack: ./scripts/assert-test-build.cjs
 appId: io.jspider.livelink.test
 productName: LiveLink Test
