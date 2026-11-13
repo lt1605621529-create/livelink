@@ -2,7 +2,7 @@ name: Windows Test Build
 on:
   workflow_dispatch:
   push:
-    branches: [build/windows-test]
+    branches: [build/windows-test, feature/rule-crud]
 permissions:
   contents: read
 concurrency:
@@ -39,6 +39,10 @@ jobs:
         run: pnpm test
       - name: TTS settings persistence and secure storage
         run: pnpm verify:tts-settings
+      - name: Rule CRUD persistence and data preservation
+        run: pnpm verify:rule-persistence
+      - name: Rule event dispatch and actual OBS page
+        run: pnpm verify:rule-overlay
       - name: Package Windows x64
         shell: pwsh
         run: |
