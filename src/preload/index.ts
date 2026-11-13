@@ -42,6 +42,9 @@ const api = {
   getTts: () => ipcRenderer.invoke(IpcChannels.ConfigGetTts),
   patchTts: (patch: Record<string, unknown>) =>
     ipcRenderer.invoke(IpcChannels.ConfigPatchTts, cleanForIpc(patch)),
+  ttsKeyStatus: () => ipcRenderer.invoke(IpcChannels.TtsKeyStatus),
+  ttsKeySave: (provider: 'fish' | 'qwen', key: string) => ipcRenderer.invoke(IpcChannels.TtsKeySave, provider, key),
+  ttsDevices: () => ipcRenderer.invoke(IpcChannels.TtsDevices),
   ttsTest: (text?: string, voice?: string) =>
     ipcRenderer.invoke(IpcChannels.TtsTest, voice ? { text, voice } : text),
   ttsVoiceList: () => ipcRenderer.invoke(IpcChannels.TtsVoiceList),

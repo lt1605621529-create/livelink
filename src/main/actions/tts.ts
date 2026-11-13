@@ -1,8 +1,11 @@
+import { join } from 'node:path'
 import { BrowserWindow } from 'electron'
 import { Communicate } from 'edge-tts-universal'
+import { CLOUD_DEFAULTS, type TTSProviderSettings } from '../../shared/tts-providers'
+import { synthesizeCloud, type CloudProvider } from '../tts/providers'
 import type { EventKind } from '../platform/adapter'
 
-export interface TTSConfig {
+export interface TTSConfig extends TTSProviderSettings {
   enabled: boolean
   voice: string
   rate: string // edge-tts 风格：'+0%' / '-20%'
@@ -116,7 +119,12 @@ export class TTSPlayer {
   // 否则 Electron 的 window-all-closed 不触发，进程会驻留。
   private parentWindow: BrowserWindow | null = null
 
+  private getKey: (provider: CloudProvider) => string = () => ''
+
+  setKeyResolver(resolver: (provider: CloudProvider) => string): void { this.getKey = resolver }
+
   setConfig(config: Partial<TTSConfig>): void {
+    if (config.provider && config.provider !== (this.config.provider ?? 'edge')) this.stop()
     this.config = { ...this.config, ...config }
   }
 
@@ -133,6 +141,11 @@ export class TTSPlayer {
 
   getConfig(): TTSConfig {
     return { ...this.config }
+  }
+
+  async outputDevices(): Promise<{ deviceId: string; label: string }[]> {
+    const win = await this.ensureAudioWindow()
+    return win.webContents.executeJavaScript(`navigator.mediaDevices.enumerateDevices().then(ds => ds.filter(d => d.kind === 'audiooutput').map(d => ({deviceId:d.deviceId,label:d.label || '音频设备'})))`)
   }
 
   getStats(): TTSStats {
@@ -173,7 +186,10 @@ export class TTSPlayer {
   }
 
   async test(text: string = '你好，我是 LiveLink，弹幕助手', voiceOverride?: string): Promise<void> {
-    await this.speak(this.applyStyle(text), this.resolveVoice({ voiceOverride }), this.generation)
+    if (this.processing) throw new Error('请等待当前朗读完成，或先清空朗读队列')
+    this.processing = true
+    try { await this.speak(this.applyStyle(text.slice(0, MAX_TEXT_LENGTH)), this.resolveVoice({ voiceOverride }), this.generation) }
+    finally { this.processing = false; if (this.queue.length) void this.drain() }
   }
 
   /** 清空队列并打断正在念的那条（主播喊停 / 断开连接时用） */
@@ -200,6 +216,11 @@ export class TTSPlayer {
 
   /** 按 options 解析 voice：voiceOverride > perEventVoice[eventKind] > 全局 voice */
   private resolveVoice(options?: EnqueueOptions): string {
+    const provider = this.config.provider ?? 'edge'
+    if (provider !== 'edge') {
+      const settings = this.config[provider] ?? CLOUD_DEFAULTS[provider]
+      return (options?.voiceOverride && !options.voiceOverride.startsWith('zh-') ? options.voiceOverride : '') || (options?.eventKind && settings.perEventVoice?.[options.eventKind]) || settings.voice
+    }
     if (options?.voiceOverride && options.voiceOverride.length > 0) return options.voiceOverride
     if (options?.eventKind) {
       const perEvent = this.config.perEventVoice?.[options.eventKind]
@@ -302,6 +323,7 @@ export class TTSPlayer {
       }
     } finally {
       this.processing = false
+      if (this.queue.length) queueMicrotask(() => void this.drain())
     }
     // processing 置回 false 与上面最后一次 dequeue 之间仍有一个极窄的窗口，
     // 期间进来的 enqueue 会因为 processing=true 直接返回。这里补一次兜底触发
@@ -313,10 +335,10 @@ export class TTSPlayer {
     const audio = await this.synthesize(text, voice)
     if (!audio || audio.length === 0) {
       console.warn('[TTSPlayer] empty synthesis result for:', text)
-      return
+      throw new Error('语音服务返回空音频')
     }
     if (gen !== this.generation) return
-    await this.play(audio)
+    await this.play(audio, true)
   }
 
   /** 合成失败不抛：drain 里任何一条失败都不应该中断整条队列 */
@@ -325,7 +347,7 @@ export class TTSPlayer {
       return await this.synthesize(item.text, item.voice)
     } catch (err) {
       this.synthFailed += 1
-      this.recordError(`语音合成失败（${(err as Error)?.message ?? '网络错误'}）——检查网络或代理能否访问微软语音服务`)
+      this.recordError(`语音合成失败（${(err as Error)?.message ?? '网络错误'}）——检查当前语音服务设置及网络`)
       console.error('[TTSPlayer] synthesize failed', err)
       return null
     }
@@ -336,6 +358,10 @@ export class TTSPlayer {
   }
 
   private async synthesize(text: string, voice: string): Promise<Buffer> {
+    const provider = this.config.provider ?? 'edge'
+    if (provider !== 'edge') {
+      return synthesizeCloud(provider, { ...this.config, [provider]: this.config[provider] ?? CLOUD_DEFAULTS[provider] }, this.getKey(provider), text, voice, this.speed())
+    }
     // edge-tts 走微软在线端点，直播机网络不稳时偶发握手失败非常常见。
     // 最多 3 次尝试（初始 + 2 重试）：再多就会让这条播报滞后到没有意义
     let lastErr: unknown
@@ -367,25 +393,38 @@ export class TTSPlayer {
     return Buffer.concat(chunks)
   }
 
-  private async play(audio: Buffer): Promise<void> {
+  private speed(): number {
+    return Math.max(0.5, Math.min(1.5, 1 + (parseFloat(this.config.rate) || 0) / 100))
+  }
+
+  private async play(audio: Buffer, strict = false): Promise<void> {
     let win: BrowserWindow
     try {
       win = await this.ensureAudioWindow()
     } catch (err) {
       this.playFailed += 1
       this.recordError(`播放窗口创建失败（${(err as Error)?.message ?? '未知错误'}）`)
-      console.error('[TTSPlayer] audio window unavailable', err)
+      if (strict) throw new Error('播放窗口不可用')
       return
     }
     if (win.isDestroyed()) return
 
-    const dataUrl = `data:audio/mpeg;base64,${audio.toString('base64')}`
+    const dataUrl = `data:${audio.subarray(0, 4).toString() === 'RIFF' ? 'audio/wav' : 'audio/mpeg'};base64,${audio.toString('base64')}`
     // 把 resolve 挂到 window 上，stopPlayback() 才有办法在 pause 之后把这个 await 解开。
     // 只 pause 不 resolve 的话 onended 永远不触发，drain 会永久卡住
-    const script = `new Promise((resolve) => {
+    const script = `new Promise(async (resolve) => {
       try {
         if (window.__llAudio) { try { window.__llAudio.pause() } catch (e) {} }
         var a = new Audio(${JSON.stringify(dataUrl)});
+        window.__llAudio = a;
+        if (${JSON.stringify(this.config.outputDeviceId ?? '')}) {
+          if (!a.setSinkId) { resolve('device-error'); return; }
+          try { await a.setSinkId(${JSON.stringify(this.config.outputDeviceId ?? '')}); }
+          catch (e) { resolve('device-error'); return; }
+        }
+        if (window.__llAudio !== a) { resolve('stopped'); return; }
+        a.volume = ${!this.config.provider || this.config.provider === 'edge' ? 1 : Math.max(0, Math.min(1, 1 + (parseFloat(this.config.volume) || 0) / 100))};
+        a.playbackRate = ${this.config.provider === 'qwen' ? this.speed() : 1};
         var settled = false;
         var done = function (why) {
           if (settled) return;
@@ -404,14 +443,14 @@ export class TTSPlayer {
     })`
     try {
       const result = await withTimeout(win.webContents.executeJavaScript(script, true), PLAYBACK_TIMEOUT_MS)
-      if (result === 'error' || result === 'play-rejected' || result === 'exception') {
-        this.playFailed += 1
-        this.recordError(`播放失败（${result}）`)
+      if (result === null) { await this.stopPlayback(); throw new Error('播放超时') }
+      if (result === 'error' || result === 'play-rejected' || result === 'exception' || result === 'device-error') {
+        throw new Error(`播放失败（${result}）`)
       }
     } catch (err) {
       this.playFailed += 1
       this.recordError(`播放失败（${(err as Error)?.message ?? '未知错误'}）`)
-      console.error('[TTSPlayer] playback failed', err)
+      if (strict) throw new Error('播放失败，请检查音频输出设备')
     }
   }
 
@@ -422,6 +461,7 @@ export class TTSPlayer {
       await win.webContents.executeJavaScript(
         `(function () {
           if (window.__llAudio) { try { window.__llAudio.pause() } catch (e) {} }
+          window.__llAudio = null;
           if (window.__llResolve) { try { window.__llResolve('stopped') } catch (e) {} }
           return 'ok';
         })()`,
@@ -445,6 +485,7 @@ export class TTSPlayer {
       focusable: false,
       parent: this.parentWindow ?? undefined,
       webPreferences: {
+        backgroundThrottling: false,
         sandbox: false,
         contextIsolation: true,
         nodeIntegration: false,
@@ -455,7 +496,7 @@ export class TTSPlayer {
     // loadURL 失败时必须把缓存的 promise 清掉，否则这个 rejected promise 会被
     // 一直复用，之后每一条播报都失败，只能重启软件
     const ready = win
-      .loadURL('about:blank')
+      .loadFile(join(__dirname, '../renderer/src/audio/index.html'))
       .then(() => undefined)
       .catch((err) => {
         if (this.audioWindow === win) {

@@ -1,3 +1,4 @@
+import type { TTSProviderSettings } from '../shared/tts-providers'
 // 渲染端用到的类型镜像（避免直接 import 主进程文件）
 import type {
   PetConfig,
@@ -94,7 +95,7 @@ export interface Rule {
   actions: ActionSpec[]
 }
 
-export interface TTSConfig {
+export interface TTSConfig extends TTSProviderSettings {
   enabled: boolean
   voice: string
   rate: string
@@ -361,6 +362,9 @@ export interface ApiSurface {
 
   getTts: () => Promise<TTSConfig>
   patchTts: (patch: Partial<TTSConfig>) => Promise<TTSConfig>
+  ttsKeyStatus: () => Promise<Record<'fish' | 'qwen', boolean>>
+  ttsKeySave: (provider: 'fish' | 'qwen', key: string) => Promise<Record<'fish' | 'qwen', boolean>>
+  ttsDevices: () => Promise<{ deviceId: string; label: string }[]>
   ttsTest: (text?: string, voice?: string) => Promise<{ ok: boolean }>
   ttsVoiceList: () => Promise<VoiceOption[]>
   ttsStop: () => Promise<{ ok: boolean }>

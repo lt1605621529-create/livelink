@@ -1,3 +1,5 @@
+import { encryptApiKey, decryptApiKey } from '../tts/credentials'
+import { CLOUD_DEFAULTS } from '../../shared/tts-providers'
 import { safeStorage } from 'electron'
 import Store from 'electron-store'
 import { defaultRules, upgradeUntouchedWelcome } from '../rules/defaults'
@@ -309,6 +311,9 @@ export class AppConfig {
   getTts(): TTSConfig {
     // 兼容老配置：旧版本无 perEventVoice 字段
     const stored = this.store.get('tts')
+    stored.provider ??= 'edge'
+    stored.fish ??= structuredClone(CLOUD_DEFAULTS.fish)
+    stored.qwen ??= structuredClone(CLOUD_DEFAULTS.qwen)
     let dirty = false
     if (!stored.perEventVoice) {
       stored.perEventVoice = {}
@@ -342,7 +347,18 @@ export class AppConfig {
     this.store.set('tts', tts)
   }
   patchTts(patch: Partial<TTSConfig>): TTSConfig {
-    const next: TTSConfig = { ...this.getTts(), ...patch }
+    const current = this.getTts()
+    // Explicit fields only: never persist credentials supplied through a settings patch.
+    const next: TTSConfig = {
+      enabled: typeof patch.enabled === 'boolean' ? patch.enabled : current.enabled,
+      voice: patch.voice ?? current.voice, rate: patch.rate ?? current.rate,
+      volume: patch.volume ?? current.volume, style: patch.style ?? current.style,
+      perEventVoice: patch.perEventVoice ?? current.perEventVoice,
+      provider: ['edge', 'fish', 'qwen'].includes(patch.provider ?? '') ? patch.provider : current.provider,
+      outputDeviceId: typeof patch.outputDeviceId === 'string' ? patch.outputDeviceId.slice(0, 512) : current.outputDeviceId,
+      fish: cleanCloud(patch.fish ?? current.fish, CLOUD_DEFAULTS.fish),
+      qwen: { ...cleanCloud(patch.qwen ?? current.qwen, CLOUD_DEFAULTS.qwen), region: (patch.qwen ?? current.qwen)?.region === 'intl' ? 'intl' : 'cn' }
+    }
     this.setTts(next)
     return next
   }
@@ -556,13 +572,20 @@ export class AppConfig {
 
   // AI 智能回复（DeepSeek，主播自备 Key）
   getAiReply(): AiReplyConfig {
-    return sanitizeAiReplyConfig(this.store.get('aiReply') as Partial<AiReplyConfig> | undefined ?? DEFAULT_AI_REPLY_CONFIG)
+    const stored = sanitizeAiReplyConfig(this.store.get('aiReply') as Partial<AiReplyConfig> | undefined ?? DEFAULT_AI_REPLY_CONFIG)
+    const key = stored.apiKey
+    if (key && !key.startsWith('safe:')) {
+      // Upgrade legacy plaintext only when secure storage is usable; fail closed otherwise.
+      try { this.setAiReply(stored) } catch { return { ...stored, apiKey: '' } }
+    }
+    return { ...stored, apiKey: decryptApiKey(key) }
   }
   getAiReplyPublic(): AiReplyPublicConfig {
     return toPublicAiReplyConfig(this.getAiReply())
   }
   setAiReply(config: AiReplyConfig): void {
-    this.store.set('aiReply', sanitizeAiReplyConfig(config))
+    const next = sanitizeAiReplyConfig(config)
+    this.store.set('aiReply', { ...next, apiKey: encryptApiKey(next.apiKey) })
   }
   patchAiReply(patch: Partial<AiReplyConfig>): AiReplyPublicConfig {
     const merged = mergeAiReplyPatch(this.getAiReply(), patch)
@@ -732,5 +755,13 @@ function normalizeDanmuOverlayBounds(
     y: Math.round(y),
     width: Math.round(width),
     height: Math.round(height)
+  }
+}
+
+function cleanCloud(value: { model: string; voice: string; perEventVoice?: Record<string, string> } | undefined, fallback: { model: string; voice: string }) {
+  return {
+    model: typeof value?.model === 'string' ? value.model.slice(0, 128) : fallback.model,
+    voice: typeof value?.voice === 'string' ? value.voice.slice(0, 128) : fallback.voice,
+    perEventVoice: Object.fromEntries(Object.entries(value?.perEventVoice ?? {}).filter(([k, v]) => ['viewer.enter','danmu.received','gift.received','guard.bought','super.chat'].includes(k) && typeof v === 'string').map(([k,v]) => [k, v.slice(0,128)]))
   }
 }

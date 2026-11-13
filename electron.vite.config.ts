@@ -57,6 +57,7 @@ export default defineConfig({
       rollupOptions: {
         input: {
           index: resolve('src/renderer/index.html'),
+          audio: resolve('src/audio/index.html'),
           overlay: resolve('src/overlay/index.html'),
           'danmu-overlay': resolve('src/danmu-overlay/index.html')
         }

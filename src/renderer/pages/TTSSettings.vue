@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { currentPage, ttsConfig, voices } from '../store'
-import type { EventKind, TTSStats } from '../types'
+import { CLOUD_DEFAULTS } from '../../shared/tts-providers'
+import type { EventKind, TTSStats, TTSConfig } from '../types'
 
 // 可分事件配音色的事件列表。和默认规则里的 TTS 触发器对齐
 const TTS_EVENTS: { kind: EventKind; label: string; hint: string }[] = [
@@ -12,7 +13,10 @@ const TTS_EVENTS: { kind: EventKind; label: string; hint: string }[] = [
   { kind: 'super.chat', label: 'SuperChat 感谢', hint: '醒目留言' }
 ]
 
-const localConfig = ref({
+const localConfig = ref<TTSConfig>({
+  provider: 'edge',
+  fish: structuredClone(CLOUD_DEFAULTS.fish),
+  qwen: structuredClone(CLOUD_DEFAULTS.qwen),
   enabled: true,
   voice: 'zh-CN-XiaoxiaoNeural',
   rate: '+0%',
@@ -20,6 +24,20 @@ const localConfig = ref({
   style: 'normal' as 'normal' | 'mambo',
   perEventVoice: {} as Partial<Record<EventKind, string>>
 })
+const key = ref('')
+const keyStatus = ref({ fish: false, qwen: false })
+const devices = ref<{deviceId: string; label: string}[]>([])
+const cloud = computed(() => localConfig.value.provider === 'qwen' ? localConfig.value.qwen! : localConfig.value.fish!)
+async function saveKey(clear = false): Promise<void> {
+  const provider = localConfig.value.provider
+  if (provider !== 'fish' && provider !== 'qwen') return
+  try { keyStatus.value = await window.api.ttsKeySave(provider, clear ? '' : key.value); key.value = '' }
+  catch { error.value = '保存 Key 失败：系统安全存储不可用或输入无效' }
+}
+async function refreshDevices(): Promise<void> {
+  try { devices.value = await window.api.ttsDevices() } catch { error.value = '无法枚举音频设备，可使用系统默认输出' }
+}
+watch(() => localConfig.value.provider, () => { key.value = '' })
 const saving = ref(false)
 const error = ref<string | null>(null)
 const testToast = ref<string | null>(null)
@@ -30,7 +48,7 @@ const RECENT_ERROR_MS = 5 * 60_000
 const healthWarning = computed<string | null>(() => {
   const last = stats.value?.lastError
   if (!last || Date.now() - last.at >= RECENT_ERROR_MS) return null
-  return `语音服务最近失败：${last.message}（本进程累计 ${stats.value?.synthFailed ?? 0} 次合成失败 / ${stats.value?.playFailed ?? 0} 次播放失败）。直播机需能直连微软语音服务。`
+  return `语音服务最近失败：${last.message}（本进程累计 ${stats.value?.synthFailed ?? 0} 次合成失败 / ${stats.value?.playFailed ?? 0} 次播放失败）。请检查当前服务和音频输出设备。`
 })
 
 async function refreshStats(): Promise<void> {
@@ -41,7 +59,7 @@ async function refreshStats(): Promise<void> {
   }
 }
 
-onMounted(() => void refreshStats())
+onMounted(async () => { await refreshStats(); keyStatus.value = await window.api.ttsKeyStatus(); await refreshDevices() })
 
 watch(
   ttsConfig,
@@ -49,6 +67,9 @@ watch(
     if (c) {
       localConfig.value = {
         ...c,
+        provider: c.provider ?? 'edge',
+        fish: c.fish ?? structuredClone(CLOUD_DEFAULTS.fish),
+        qwen: c.qwen ?? structuredClone(CLOUD_DEFAULTS.qwen),
         style: c.style ?? 'normal',
         perEventVoice: { ...(c.perEventVoice ?? {}) }
       }
@@ -58,23 +79,24 @@ watch(
 )
 
 function getEventVoice(kind: EventKind): string {
-  return localConfig.value.perEventVoice?.[kind] ?? ''
+  return (localConfig.value.provider === 'edge' ? localConfig.value.perEventVoice : cloud.value.perEventVoice)?.[kind] ?? ''
 }
 
 async function setEventVoice(kind: EventKind, voice: string): Promise<void> {
-  const next = { ...(localConfig.value.perEventVoice ?? {}) }
+  const next = { ...((localConfig.value.provider === 'edge' ? localConfig.value.perEventVoice : cloud.value.perEventVoice) ?? {}) }
   if (!voice) {
     delete next[kind]
   } else {
     next[kind] = voice
   }
-  localConfig.value.perEventVoice = next
+  if (localConfig.value.provider === 'edge') localConfig.value.perEventVoice = next
+  else cloud.value.perEventVoice = next
   await persist()
 }
 
 async function testEventVoice(kind: EventKind): Promise<void> {
   // 试听该事件实际会用的 voice：perEvent 覆盖优先，否则全局
-  const voice = getEventVoice(kind) || localConfig.value.voice
+  const voice = getEventVoice(kind) || (localConfig.value.provider === 'edge' ? localConfig.value.voice : cloud.value.voice)
   testToast.value = '正在合成…'
   try {
     await window.api.ttsTest(undefined, voice)
@@ -179,8 +201,31 @@ async function test(): Promise<void> {
         </button>
       </div>
 
+      <label class="block">语音服务
+        <select v-model="localConfig.provider" @change="persist" class="w-full bg-slate-950 p-2">
+          <option value="edge">Edge TTS</option><option value="fish">Fish Audio</option><option value="qwen">百炼 Qwen TTS</option>
+        </select>
+      </label>
+      <div v-if="localConfig.provider !== 'edge'" class="space-y-3">
+        <p class="text-sm">Key 状态：{{ keyStatus[localConfig.provider === 'qwen' ? 'qwen' : 'fish'] ? '已配置' : '未配置' }}（系统加密存储，不回显）</p>
+        <input v-model="key" type="password" autocomplete="new-password" placeholder="API Key" aria-label="API Key" class="w-full bg-slate-950 p-2" />
+        <button @click="saveKey(false)" :disabled="!key.trim()" class="mr-4">保存 Key</button><button @click="saveKey(true)">清除 Key</button>
+        <label class="block">模型<input v-model="cloud.model" @change="persist" class="w-full bg-slate-950 p-2" /></label>
+        <label class="block">音色 ID / 名称<input v-model="cloud.voice" @change="persist" class="w-full bg-slate-950 p-2" /></label>
+        <label v-if="localConfig.provider === 'qwen'" class="block">百炼地域
+          <select v-model="localConfig.qwen!.region" @change="persist" class="bg-slate-950 p-2"><option value="cn">中国北京</option><option value="intl">国际（新加坡）</option></select>
+        </label>
+        <p class="text-xs text-slate-400">Fish 使用 reference_id 音色与服务端语速。Qwen 使用模型支持的音色名称，语速在本地播放时调整。Key 与模型必须属于所选地域。</p>
+      </div>
+      <label class="block">音频输出设备
+        <select v-model="localConfig.outputDeviceId" @change="persist" class="w-full bg-slate-950 p-2">
+          <option value="">系统默认</option><option v-for="device in devices" :key="device.deviceId" :value="device.deviceId">{{ device.label }}</option>
+        </select>
+        <button @click="refreshDevices">刷新设备</button>
+        <p class="text-xs text-slate-400">可选择 CABLE Input 供 OBS 采集 CABLE Output。设备失效时会报告播放失败，请重新选择。</p>
+      </label>
       <!-- 音色 -->
-      <label class="block">
+      <label v-if="localConfig.provider === 'edge'" class="block">
         <span class="mb-1 block text-sm text-slate-300">音色</span>
         <select
           v-model="localConfig.voice"
@@ -197,7 +242,7 @@ async function test(): Promise<void> {
           v-model="localConfig.style"
           @change="
             () => {
-              if (localConfig.style === 'mambo') {
+              if (localConfig.style === 'mambo' && localConfig.provider === 'edge') {
                 localConfig.voice = 'zh-CN-YunxiaNeural'
                 localConfig.rate = '+15%'
               }
@@ -285,7 +330,8 @@ async function test(): Promise<void> {
             <div class="text-sm text-slate-200">{{ ev.label }}</div>
             <div class="text-xs text-slate-500">{{ ev.hint }}</div>
           </div>
-          <select
+          <input v-if="localConfig.provider !== 'edge'" :value="getEventVoice(ev.kind)" @change="setEventVoice(ev.kind, ($event.target as HTMLInputElement).value)" placeholder="留空使用全局音色" class="w-44 bg-slate-950 p-2" />
+          <select v-else
             :value="getEventVoice(ev.kind)"
             @change="setEventVoice(ev.kind, ($event.target as HTMLSelectElement).value)"
             class="w-44 rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-100"

@@ -29,11 +29,13 @@
     "verify:assets": "esbuild scripts/verify-assets.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/verify-assets.cjs --external:electron --log-level=warning && node node_modules/.cache/verify-assets.cjs",
     "verify:ai-reply": "esbuild scripts/verify-ai-reply.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/verify-ai-reply.cjs --log-level=warning && node node_modules/.cache/verify-ai-reply.cjs",
     "verify:danmu-display": "esbuild scripts/verify-danmu-display.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/verify-danmu-display.cjs --log-level=warning && node node_modules/.cache/verify-danmu-display.cjs",
-    "verify:welcome": "esbuild scripts/verify-welcome.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/verify-welcome.cjs --external:electron --log-level=warning && node node_modules/.cache/verify-welcome.cjs"
+    "verify:welcome": "esbuild scripts/verify-welcome.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/verify-welcome.cjs --external:electron --log-level=warning && node node_modules/.cache/verify-welcome.cjs",
+    "verify:tts": "esbuild scripts/verify-tts-providers.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/verify-tts-providers.cjs --log-level=warning && node node_modules/.cache/verify-tts-providers.cjs"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
+    "@msgpack/msgpack": "3.1.2",
     "blive-message-listener": "^0.5.0",
     "edge-tts-universal": "^1.0.0",
     "electron-store": "^8.2.0",

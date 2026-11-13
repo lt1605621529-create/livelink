@@ -21,6 +21,9 @@ export const IpcChannels = {
   RuleDelete: 'rule:delete',
 
   // TTS
+  TtsKeyStatus: 'tts:key-status',
+  TtsKeySave: 'tts:key-save',
+  TtsDevices: 'tts:devices',
   TtsTest: 'tts:test',
   TtsVoiceList: 'tts:voice-list',
   TtsStop: 'tts:stop',

@@ -1,3 +1,4 @@
+import { saveTtsKey, ttsKeyStatus } from './tts/credentials'
 import { ipcMain, net, powerMonitor, type BrowserWindow } from 'electron'
 import { IpcChannels, type ConnectionStatus } from '../shared/ipc-channels'
 import type { BilibiliAdapter } from './platform/bilibili'
@@ -581,6 +582,9 @@ export function registerIpcHandlers(deps: IpcDeps): void {
     return list
   })
 
+  ipcMain.handle(IpcChannels.TtsKeyStatus, () => ttsKeyStatus())
+  ipcMain.handle(IpcChannels.TtsKeySave, (_e, provider, key) => { saveTtsKey(provider, key); return ttsKeyStatus() })
+  ipcMain.handle(IpcChannels.TtsDevices, () => ttsPlayer.outputDevices())
   // ─── TTS ────────────────────────────────────────────────────
   ipcMain.handle(
     IpcChannels.TtsTest,

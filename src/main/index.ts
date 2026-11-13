@@ -1,3 +1,4 @@
+import { getTtsKey } from './tts/credentials'
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'node:path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -33,10 +34,14 @@ import { IpcChannels, type ConnectionStatus } from '../shared/ipc-channels'
 let mainWindow: BrowserWindow | null = null
 const status: { current: ConnectionStatus } = { current: { state: 'idle' } }
 
+// Development never opens the installed application's user data.
+if (!app.isPackaged) app.setPath('userData', join(app.getPath('appData'), 'LiveLink-Development'))
+
 // ─── 单例服务装配 ─────────────────────────────────────────────
 const config = new AppConfig()
 const log = new LogSink(500)
 const ttsPlayer = new TTSPlayer()
+ttsPlayer.setKeyResolver(getTtsKey)
 ttsPlayer.setConfig(config.getTts())
 
 const overlayBroadcaster = new OverlayBroadcaster()
