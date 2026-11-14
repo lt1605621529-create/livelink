@@ -12,6 +12,8 @@ app.disableHardwareAcceleration()
 let stage='load-renderer'
 ipcMain.on('ai-test:stage', (_e, label:string) => { if (/^[a-z-]+$/.test(label)) stage=label })
 void app.whenReady().then(async()=>{
+  const secure=safeStorage.isEncryptionAvailable() && (process.platform!=='linux'||safeStorage.getSelectedStorageBackend()!=='basic_text')
+  if(process.platform==='win32' && !secure) throw Error('Windows DPAPI is required for this regression')
   const config=new AppConfig()
   const dummy='sk-fictional-storage-regression-key-0000'
   let invokes=0,handles=0,failStorage=false
@@ -19,7 +21,7 @@ void app.whenReady().then(async()=>{
   config.patchAiReply=value=>{handles++;if(failStorage)throw Error(dummy);return patch(value)}
   registerAiReplyConfigIpc(config)
   ipcMain.on('ai-test:invoke',()=>{invokes++})
-  ipcMain.handle('ai-test:state',()=>({invokes,handles,secure:safeStorage.isEncryptionAvailable() && (process.platform!=='linux'||safeStorage.getSelectedStorageBackend()!=='basic_text')}))
+  ipcMain.handle('ai-test:state',()=>({invokes,handles,secure}))
   ipcMain.handle('ai-test:fail-storage',(_e,value:boolean)=>{failStorage=value})
   ipcMain.handle('ai-test:disk',()=>{
     const raw=readFileSync(join(profile,'livelink-config.json'),'utf8')
