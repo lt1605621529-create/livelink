@@ -1,3 +1,4 @@
+import { registerAiReplyConfigIpc } from './config/ai-reply-ipc'
 import { saveTtsKey, ttsKeyStatus } from './tts/credentials'
 import { ipcMain, net, powerMonitor, type BrowserWindow } from 'electron'
 import { IpcChannels, type ConnectionStatus } from '../shared/ipc-channels'
@@ -25,7 +26,6 @@ import type { SongRequestConfig } from '../shared/song-request'
 import type { WalletStore } from './services/wallet-store'
 import type { GuessingGlobalConfig } from './config/store'
 import type { PetConfig } from '../shared/pets'
-import type { AiReplyConfig } from '../shared/ai-reply'
 import type { OverlayThemeConfig } from '../shared/overlay-theme'
 import type { DanmuBoardConfig, DanmuOverlaySettings } from '../shared/danmu-display'
 import { toFriendlyError } from './errors/friendly'
@@ -560,10 +560,7 @@ export function registerIpcHandlers(deps: IpcDeps): void {
   })
 
   // ─── AI 智能回复（DeepSeek，主播自备 Key） ───────────────────
-  ipcMain.handle(IpcChannels.AiReplyConfigGet, () => config.getAiReplyPublic())
-  ipcMain.handle(IpcChannels.AiReplyConfigPatch, (_e, patch: Partial<AiReplyConfig>) =>
-    config.patchAiReply(patch)
-  )
+  registerAiReplyConfigIpc(config)
   ipcMain.handle(IpcChannels.AiReplyTest, async (_e, prompt?: string) => {
     const reply = await aiReply.test(prompt || '用一句话介绍你自己')
     return { reply }

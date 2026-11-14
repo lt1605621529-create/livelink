@@ -1,3 +1,5 @@
+import { cleanForIpc } from './ipc-dto'
+
 export interface AiReplyConfig {
   enabled: boolean
   apiKey: string
@@ -103,4 +105,26 @@ export function toPublicAiReplyConfig(config: AiReplyConfig): AiReplyPublicConfi
 function clampInt(value: number, min: number, max: number): number {
   if (!Number.isFinite(value)) return min
   return Math.max(min, Math.min(max, Math.round(value)))
+}
+
+// Build the DTO in the renderer, before contextBridge attempts to copy arguments.
+// Whitelist editable fields: public Key metadata must never become a settings patch.
+export function toAiReplyPatchDto(config: AiReplyPublicConfig, keyInput = ''): Partial<AiReplyConfig> {
+  const patch: Partial<AiReplyConfig> = {
+    enabled: config.enabled,
+    model: config.model,
+    systemPrompt: config.systemPrompt,
+    triggerMode: config.triggerMode,
+    mentionName: config.mentionName,
+    keywords: Array.from(config.keywords),
+    cooldownSec: config.cooldownSec,
+    perUserCooldownSec: config.perUserCooldownSec,
+    maxInputLength: config.maxInputLength,
+    maxReplyLength: config.maxReplyLength,
+    speakReply: config.speakReply,
+    logReply: config.logReply
+  }
+  const key = normalizeApiKey(keyInput)
+  if (key) patch.apiKey = key // Empty input means keep the saved key. Clearing uses an explicit empty string.
+  return cleanForIpc(patch)
 }

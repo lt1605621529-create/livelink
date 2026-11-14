@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { normalizeApiKey } from '../../shared/ai-reply'
+import { normalizeApiKey, toAiReplyPatchDto } from '../../shared/ai-reply'
 import type { AiReplyPublicConfig } from '../types'
 
 const config = ref<AiReplyPublicConfig | null>(null)
@@ -52,19 +52,18 @@ async function save(): Promise<boolean> {
   clearNotices()
   const key = normalizeApiKey(apiKeyInput.value)
   try {
-    const patch: Partial<AiReplyPublicConfig> & { apiKey?: string } = { ...config.value }
-    // 输入框留空 = 不动已保存的 Key（主播改冷却、人格时不用把 Key 再粘一遍）
-    if (key) patch.apiKey = key
-    config.value = await window.api.aiReplyConfigPatch(patch)
+    const patch = toAiReplyPatchDto(config.value, key)
+    const saved = await window.api.aiReplyConfigPatch(patch)
     // 主进程写配置失败会抛错；万一哪天不抛，这里再兜一道，
     // 绝不让"没存上"冒充"保存成功"
-    if (key && !config.value.hasApiKey) {
+    if (key && !saved.hasApiKey) {
       throw new Error('Key 没能写进配置文件，看看杀毒软件是不是锁住了 LiveLink 的配置。')
     }
+    config.value = saved
     apiKeyInput.value = ''
     return true
-  } catch (err) {
-    error.value = friendlyMessage(err, '保存失败')
+  } catch {
+    error.value = '保存失败：请检查配置格式、系统安全存储和文件写入权限后重试。输入的 Key 已保留。'
     return false
   } finally {
     saving.value = false
@@ -110,8 +109,8 @@ async function clearKey(): Promise<void> {
     apiKeyInput.value = ''
     toast.value = '已清除保存的 Key，AI 回复不会再调用 API'
     setTimeout(() => (toast.value = null), 4000)
-  } catch (err) {
-    error.value = friendlyMessage(err, '清除失败')
+  } catch {
+    error.value = '清除失败：请检查系统安全存储和配置文件写入权限后重试。'
   } finally {
     saving.value = false
   }

@@ -10,7 +10,7 @@ import type {
   PetState,
   UserPet
 } from '../shared/pets'
-import type { AiReplyPublicConfig } from '../shared/ai-reply'
+import type { AiReplyConfig, AiReplyPublicConfig } from '../shared/ai-reply'
 import type { OverlayThemeConfig } from '../shared/overlay-theme'
 import type { DanmuReaderConfig, ReaderScope } from '../shared/danmu-reader'
 import type {
@@ -452,7 +452,7 @@ export interface ApiSurface {
 
   // AI 智能回复
   aiReplyConfigGet: () => Promise<AiReplyPublicConfig>
-  aiReplyConfigPatch: (patch: Partial<AiReplyPublicConfig> & { apiKey?: string }) => Promise<AiReplyPublicConfig>
+  aiReplyConfigPatch: (patch: Partial<AiReplyConfig>) => Promise<AiReplyPublicConfig>
   aiReplyTest: (prompt?: string) => Promise<{ reply: string }>
 
   ruleList: () => Promise<Rule[]>
