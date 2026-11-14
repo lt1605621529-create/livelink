@@ -1,7 +1,7 @@
 const { spawnSync } = require('node:child_process')
 const { appendFileSync } = require('node:fs')
 let failed = false
-for (const name of ['rules','tts','reader','song','assets','ai-reply','danmu-display','welcome']) {
+for (const name of ['ai-dto','rules','tts','reader','song','assets','ai-reply','danmu-display','welcome']) {
   const result = spawnSync(process.execPath, [process.env.npm_execpath, 'run', `verify:${name}`], {
     encoding: 'utf8', maxBuffer: 32 * 1024 * 1024
   })

@@ -2,7 +2,7 @@ name: Windows Test Build
 on:
   workflow_dispatch:
   push:
-    branches: [build/windows-test, feature/rule-crud]
+    branches: [build/windows-test, feature/rule-crud, fix/ai-key-ipc]
 permissions:
   contents: read
 concurrency:
@@ -43,6 +43,8 @@ jobs:
         run: pnpm verify:rule-persistence
       - name: Rule event dispatch and actual OBS page
         run: pnpm verify:rule-overlay
+      - name: AI Context Bridge, real UI and encrypted Key regression
+        run: pnpm verify:ai-ipc
       - name: Package Windows x64
         shell: pwsh
         run: |
