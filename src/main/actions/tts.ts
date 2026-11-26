@@ -1,3 +1,4 @@
+import { masterPlaybackGain } from '../../shared/tts-volume'
 import { join } from 'node:path'
 import { BrowserWindow } from 'electron'
 import { Communicate } from 'edge-tts-universal'
@@ -9,7 +10,7 @@ export interface TTSConfig extends TTSProviderSettings {
   enabled: boolean
   voice: string
   rate: string // edge-tts 风格：'+0%' / '-20%'
-  volume: string // edge-tts 风格：'+0%' / '-20%'
+  volume: number // 0–100，三种服务共用本地播放主音量
   style?: 'normal' | 'mambo'
   // 分事件音色覆盖。key 是 EventKind，value 是 voice 字符串。
   // 空 / undefined / 空字符串 → 用全局 voice。rate/volume 不分事件（共用全局）
@@ -20,7 +21,7 @@ export const DEFAULT_TTS_CONFIG: TTSConfig = {
   enabled: true,
   voice: 'zh-CN-XiaoxiaoNeural',
   rate: '+0%',
-  volume: '+0%',
+  volume: 100,
   style: 'normal',
   perEventVoice: {}
 }
@@ -381,7 +382,7 @@ export class TTSPlayer {
     const c = new Communicate(text, {
       voice,
       rate: this.config.rate,
-      volume: this.config.volume,
+      volume: '+0%',
       connectionTimeout: SYNTHESIS_TIMEOUT_MS
     })
     const chunks: Buffer[] = []
@@ -423,7 +424,8 @@ export class TTSPlayer {
           catch (e) { resolve('device-error'); return; }
         }
         if (window.__llAudio !== a) { resolve('stopped'); return; }
-        a.volume = ${!this.config.provider || this.config.provider === 'edge' ? 1 : Math.max(0, Math.min(1, 1 + (parseFloat(this.config.volume) || 0) / 100))};
+        a.volume = ${masterPlaybackGain(this.config.volume)};
+        a.muted = a.volume === 0;
         a.playbackRate = ${this.config.provider === 'qwen' ? this.speed() : 1};
         var settled = false;
         var done = function (why) {

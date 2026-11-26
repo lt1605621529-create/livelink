@@ -73,7 +73,7 @@ export interface TTSConfig extends TTSProviderSettings {
   enabled: boolean
   voice: string
   rate: string
-  volume: string
+  volume: number
   style?: 'normal' | 'mambo'
   // 分事件音色覆盖（key 是 EventKind，value 是 voice）
   perEventVoice?: Partial<Record<EventKind, string>>

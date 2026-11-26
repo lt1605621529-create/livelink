@@ -1,3 +1,4 @@
+import { normalizeMasterVolume } from '../../shared/tts-volume'
 import { validateRule } from '../../shared/rules'
 import { encryptApiKey, decryptApiKey } from '../tts/credentials'
 import { CLOUD_DEFAULTS } from '../../shared/tts-providers'
@@ -316,7 +317,9 @@ export class AppConfig {
     stored.provider ??= 'edge'
     stored.fish ??= structuredClone(CLOUD_DEFAULTS.fish)
     stored.qwen ??= structuredClone(CLOUD_DEFAULTS.qwen)
-    let dirty = false
+    const volume = normalizeMasterVolume(stored.volume)
+    let dirty = stored.volume !== volume
+    stored.volume = volume
     if (!stored.perEventVoice) {
       stored.perEventVoice = {}
       dirty = true
@@ -354,7 +357,7 @@ export class AppConfig {
     const next: TTSConfig = {
       enabled: typeof patch.enabled === 'boolean' ? patch.enabled : current.enabled,
       voice: patch.voice ?? current.voice, rate: patch.rate ?? current.rate,
-      volume: patch.volume ?? current.volume, style: patch.style ?? current.style,
+      volume: normalizeMasterVolume(patch.volume ?? current.volume), style: patch.style ?? current.style,
       perEventVoice: patch.perEventVoice ?? current.perEventVoice,
       provider: ['edge', 'fish', 'qwen'].includes(patch.provider ?? '') ? patch.provider : current.provider,
       outputDeviceId: typeof patch.outputDeviceId === 'string' ? patch.outputDeviceId.slice(0, 512) : current.outputDeviceId,

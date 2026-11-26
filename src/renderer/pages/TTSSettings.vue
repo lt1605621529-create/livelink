@@ -20,7 +20,7 @@ const localConfig = ref<TTSConfig>({
   enabled: true,
   voice: 'zh-CN-XiaoxiaoNeural',
   rate: '+0%',
-  volume: '+0%',
+  volume: 100,
   style: 'normal' as 'normal' | 'mambo',
   perEventVoice: {} as Partial<Record<EventKind, string>>
 })
@@ -112,11 +112,6 @@ const ratePct = computed({
   get: () => parsePct(localConfig.value.rate),
   set: (v: number) => (localConfig.value.rate = formatPct(v))
 })
-const volumePct = computed({
-  get: () => parsePct(localConfig.value.volume),
-  set: (v: number) => (localConfig.value.volume = formatPct(v))
-})
-
 function parsePct(s: string): number {
   const m = /([-+]?\d+)/.exec(s ?? '')
   return m ? Number(m[1]) : 0
@@ -276,15 +271,15 @@ async function test(): Promise<void> {
       <!-- 音量 -->
       <label class="block">
         <span class="mb-1 flex items-center justify-between text-sm text-slate-300">
-          音量 <span class="text-xs text-slate-500">{{ localConfig.volume }}</span>
+          主音量 <span class="text-xs text-slate-500">{{ localConfig.volume }}%</span>
         </span>
         <input
-          type="range" :min="-50" :max="50" :step="5"
-          :value="volumePct"
-          @input="(volumePct = Number(($event.target as HTMLInputElement).value))"
+          type="range" :min="0" :max="100" :step="1"
+          v-model.number="localConfig.volume"
           @change="persist"
           class="w-full accent-sky-500"
         />
+        <span class="text-xs text-slate-500">0% 静音。松开滑块后保存，从下一条播放起生效。</span>
       </label>
 
       <!-- 测试 -->
