@@ -9,6 +9,7 @@ import WalletCard from './components/WalletCard.vue'
 import LotteryCard from './components/LotteryCard.vue'
 import LotteryResultCard from './components/LotteryResultCard.vue'
 import DanmuBoard from './components/DanmuBoard.vue'
+import ThemePreview from './components/ThemePreview.vue'
 import SuperChatBanner from './components/SuperChatBanner.vue'
 import VotingCard from './components/VotingCard.vue'
 import VotingResultCard from './components/VotingResultCard.vue'
@@ -270,6 +271,7 @@ const songBoardPositionClass = computed(() => {
       return 'right-4 top-4'
   }
 })
+const showThemePreview = new URLSearchParams(location.search).get('theme-preview') === '1'
 const overlayThemeId = ref<OverlayThemeId>(DEFAULT_OVERLAY_THEME.id)
 
 // 开场招牌：游戏启动那 2.4 秒显示
@@ -947,6 +949,8 @@ onMounted(() => {
 
 <template>
   <div class="overlay-root relative h-screen w-screen overflow-hidden" :class="`overlay-theme-${overlayThemeId}`">
+    <ThemePreview v-if="showThemePreview" :board="danmuBoardConfig" />
+    <template v-else>
     <!-- 顶部进房欢迎区 -->
     <div class="absolute left-1/2 top-6 -translate-x-1/2 flex flex-col items-center gap-2">
       <ViewerEnterBanner v-for="e in activeEnters" :key="e.id" :text="e.text" />
@@ -1208,6 +1212,7 @@ onMounted(() => {
         :duration-sec="legendarySuperChat.durationSec"
       />
     </div>
+    </template>
   </div>
 </template>
 
@@ -1217,6 +1222,7 @@ body { background: transparent; }
 
 .overlay-root {
   --ov-accent: #38bdf8;
+  --ov-panel-end: rgba(12, 44, 67, 0.94);
   --ov-accent-2: #f59e0b;
   --ov-card-bg: rgba(15, 23, 42, 0.78);
   --ov-card-border: rgba(148, 163, 184, 0.28);
@@ -1230,9 +1236,10 @@ body { background: transparent; }
 }
 
 .overlay-theme-sakura {
-  --ov-accent: #fb7185;
+  --ov-accent: #fda4af;
+  --ov-panel-end: rgba(107, 29, 64, 0.94);
   --ov-accent-2: #f9a8d4;
-  --ov-card-bg: rgba(76, 29, 60, 0.58);
+  --ov-card-bg: rgba(76, 29, 60, 0.9);
   --ov-card-border: rgba(251, 207, 232, 0.55);
   --ov-text: #fff7ed;
   --ov-muted: #ffe4e6;
@@ -1241,9 +1248,10 @@ body { background: transparent; }
 }
 
 .overlay-theme-candy {
-  --ov-accent: #2dd4bf;
+  --ov-accent: #5eead4;
+  --ov-panel-end: rgba(10, 82, 71, 0.94);
   --ov-accent-2: #f9a8d4;
-  --ov-card-bg: rgba(20, 83, 88, 0.54);
+  --ov-card-bg: rgba(20, 62, 68, 0.9);
   --ov-card-border: rgba(153, 246, 228, 0.46);
   --ov-text: #f0fdfa;
   --ov-muted: #ccfbf1;
@@ -1252,9 +1260,10 @@ body { background: transparent; }
 }
 
 .overlay-theme-neon {
-  --ov-accent: #a855f7;
+  --ov-accent: #d8b4fe;
+  --ov-panel-end: rgba(69, 24, 117, 0.96);
   --ov-accent-2: #22d3ee;
-  --ov-card-bg: rgba(24, 13, 49, 0.72);
+  --ov-card-bg: rgba(24, 13, 49, 0.94);
   --ov-card-border: rgba(216, 180, 254, 0.5);
   --ov-text: #faf5ff;
   --ov-muted: #e9d5ff;
@@ -1265,7 +1274,8 @@ body { background: transparent; }
 .overlay-root .enter-banner {
   border: 1px solid var(--ov-card-border);
   border-radius: 999px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--ov-accent), transparent 10%), color-mix(in srgb, var(--ov-accent-2), transparent 8%)) !important;
+  background: linear-gradient(135deg, var(--ov-card-bg), var(--ov-panel-end));
+  border-left: 4px solid var(--ov-accent);
   color: var(--ov-text);
   box-shadow: 0 10px 34px var(--ov-glow);
   backdrop-filter: blur(var(--ov-blur));
@@ -1273,19 +1283,22 @@ body { background: transparent; }
 
 .overlay-root .gift-card,
 .overlay-root .hr-card,
-.overlay-root .guess-card,
-.overlay-root .guess-result,
-.overlay-root .vote-card,
-.overlay-root .vote-result,
+.overlay-root .gc-card,
+.overlay-root .grc-card,
+.overlay-root .voting-card,
+.overlay-root .vrc-card,
 .overlay-root .lottery-card,
-.overlay-root .lottery-result,
+.overlay-root .result-card,
+.overlay-root .hrr-card,
+.overlay-root .sc-card,
+.overlay-root .pet-card,
+.overlay-root .song-board,
 .overlay-root .blindbox-card,
 .overlay-root .wallet-card {
   border-color: var(--ov-card-border) !important;
   border-radius: var(--ov-radius) !important;
   background:
-    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--ov-accent), transparent 64%), transparent 34%),
-    linear-gradient(135deg, var(--ov-card-bg), rgba(15, 23, 42, 0.72)) !important;
+    linear-gradient(135deg, var(--ov-card-bg), var(--ov-panel-end)) !important;
   color: var(--ov-text) !important;
   box-shadow: 0 18px 56px rgba(0, 0, 0, 0.48), 0 0 34px var(--ov-glow) !important;
   backdrop-filter: blur(var(--ov-blur));
@@ -1294,12 +1307,13 @@ body { background: transparent; }
 .overlay-root .pet-dock {
   border-color: var(--ov-card-border);
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--ov-accent), transparent 82%), var(--ov-card-bg));
+    linear-gradient(180deg, var(--ov-panel-end), var(--ov-card-bg));
   box-shadow: 0 -14px 46px var(--ov-glow);
 }
 
-.overlay-root .pet-card {
-  --accent: var(--ov-accent);
+.overlay-root .pet-card,
+.overlay-root .pet-slot {
+  --accent: var(--ov-accent) !important;
 }
 
 .overlay-theme-sakura .intro-card {

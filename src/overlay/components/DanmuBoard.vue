@@ -40,12 +40,12 @@ const boardStyle = computed<Record<string, string>>(() => {
     '--font-family': getDanmuFontStack(c.fontFamily),
     '--font-size': `${c.fontSize}px`,
     '--font-weight': String(c.fontWeight),
-    '--text-color': hexToRgba(c.textColor, c.textOpacity),
-    '--muted-color': hexToRgba(c.textColor, c.textOpacity * 0.62),
-    '--username-color': hexToRgba(c.usernameColor, c.textOpacity),
-    '--gift-color': hexToRgba(c.giftColor, c.textOpacity),
-    '--background-color': hexToRgba(c.backgroundColor, c.backgroundOpacity),
-    '--panel-border': hexToRgba(c.textColor, c.backgroundOpacity > 0 ? 0.16 : 0),
+    '--text-color': c.followTheme ? 'var(--ov-text)' : hexToRgba(c.textColor, c.textOpacity),
+    '--muted-color': c.followTheme ? 'var(--ov-muted)' : hexToRgba(c.textColor, c.textOpacity * 0.62),
+    '--username-color': c.followTheme ? 'var(--ov-accent)' : hexToRgba(c.usernameColor, c.textOpacity),
+    '--gift-color': c.followTheme ? 'var(--ov-accent-2)' : hexToRgba(c.giftColor, c.textOpacity),
+    '--background-color': c.followTheme ? 'var(--ov-card-bg)' : hexToRgba(c.backgroundColor, c.backgroundOpacity),
+    '--panel-border': c.followTheme ? 'var(--ov-card-border)' : hexToRgba(c.textColor, c.backgroundOpacity > 0 ? 0.16 : 0),
     '--text-opacity': String(c.textOpacity),
     '--line-height': String(c.lineHeight),
     '--line-gap': `${c.lineGap}px`,
@@ -181,7 +181,7 @@ defineExpose({ push, clear })
 </script>
 
 <template>
-  <div class="board" :class="animationClass" :style="boardStyle">
+  <div class="board" :class="[animationClass, { 'board-follow-theme': config.followTheme }]" :style="boardStyle">
     <div ref="scrollEl" class="scroll">
       <div v-if="!previewFull && visibleItems.length === 0" class="placeholder">
         弹幕区 · 等待弹幕…
@@ -233,6 +233,11 @@ defineExpose({ push, clear })
   font-weight: var(--font-weight, 400);
   text-shadow: var(--text-shadow);
   box-shadow: var(--panel-shadow);
+}
+.board-follow-theme .badge {
+  background: var(--ov-card-bg);
+  color: var(--ov-accent);
+  border: 1px solid var(--ov-card-border);
 }
 .scroll {
   max-height: calc(var(--board-max-h, 80vh) - 22px);

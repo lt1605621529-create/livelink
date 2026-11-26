@@ -60,7 +60,7 @@ defineProps<{
   border-radius: 999px;
   background: color-mix(in srgb, var(--accent), rgba(15, 23, 42, 0.82) 46%);
   padding: 1px 6px;
-  color: white;
+  color: var(--ov-text, white);
   font-size: 10px;
   font-weight: 800;
   line-height: 1.5;
@@ -74,12 +74,12 @@ defineProps<{
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 .pet-name {
-  color: #f8fafc;
+  color: var(--ov-text, #f8fafc);
   font-size: 12px;
   font-weight: 800;
 }
 .pet-owner {
-  color: #cbd5e1;
+  color: var(--ov-muted, #cbd5e1);
   font-size: 10px;
 }
 @keyframes petIdle {

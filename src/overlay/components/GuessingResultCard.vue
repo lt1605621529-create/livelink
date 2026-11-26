@@ -61,7 +61,7 @@ const MEDALS = ['🥇', '🥈', '🥉']
   border-radius: 16px;
   background: linear-gradient(135deg, rgba(6, 95, 70, 0.94), rgba(15, 23, 42, 0.92));
   padding: 1.4rem 1.6rem;
-  color: #d1fae5;
+  color: var(--ov-text, #d1fae5);
   border: 1px solid rgba(52, 211, 153, 0.6);
   box-shadow: 0 22px 60px -10px rgba(0, 0, 0, 0.7), 0 0 36px rgba(52, 211, 153, 0.35);
 }
@@ -73,12 +73,12 @@ const MEDALS = ['🥇', '🥈', '🥉']
 .grc-title-tag {
   font-size: 1rem;
   font-weight: 700;
-  color: #34d399;
+  color: var(--ov-accent, #34d399);
 }
 .grc-title {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--ov-text, #f1f5f9);
   margin-bottom: 0.5rem;
 }
 .grc-winner-row {
@@ -90,23 +90,23 @@ const MEDALS = ['🥇', '🥈', '🥉']
   border-radius: 10px;
   margin-bottom: 0.9rem;
 }
-.grc-winner-label { color: #34d399; font-size: 0.85rem; font-weight: 600; }
+.grc-winner-label { color: var(--ov-accent, #34d399); font-size: 0.85rem; font-weight: 600; }
 .grc-winner-name {
   flex: 1;
   font-size: 1.15rem;
   font-weight: 700;
-  color: #fcd34d;
+  color: var(--ov-accent, #fcd34d);
 }
 .grc-pool {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
   font-variant-numeric: tabular-nums;
 }
 
 .grc-empty {
   text-align: center;
   padding: 1.5rem;
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
   font-size: 0.95rem;
 }
 
@@ -121,13 +121,13 @@ const MEDALS = ['🥇', '🥈', '🥉']
   animation: winnerReveal 0.5s ease-out both;
 }
 .grc-medal { font-size: 1.3rem; }
-.grc-uname { flex: 1; font-size: 1rem; color: #f1f5f9; font-weight: 500; }
+.grc-uname { flex: 1; font-size: 1rem; color: var(--ov-text, #f1f5f9); font-weight: 500; }
 .grc-payout {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
   font-variant-numeric: tabular-nums;
 }
-.grc-payout strong { color: #34d399; font-size: 1.1em; }
+.grc-payout strong { color: var(--ov-accent, #34d399); font-size: 1.1em; }
 
 @keyframes grcIn {
   from { transform: translateY(-30px) scale(0.85); opacity: 0; filter: blur(6px); }

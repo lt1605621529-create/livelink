@@ -94,7 +94,7 @@ function percent(opt: Option): number {
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(120, 53, 15, 0.82));
   padding: 1.2rem 1.5rem;
-  color: #fef3c7;
+  color: var(--ov-text, #fef3c7);
   border: 1px solid rgba(251, 191, 36, 0.5);
   box-shadow: 0 18px 50px -10px rgba(0, 0, 0, 0.7), 0 0 28px rgba(251, 191, 36, 0.3);
 }
@@ -108,12 +108,12 @@ function percent(opt: Option): number {
 .gc-badge {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #fcd34d;
+  color: var(--ov-accent, #fcd34d);
 }
-.gc-badge-locked { color: #93c5fd; }
+.gc-badge-locked { color: var(--ov-accent, #93c5fd); }
 .gc-title {
   font-size: 1.15rem;
-  color: #f1f5f9;
+  color: var(--ov-text, #f1f5f9);
   margin-top: 4px;
   font-weight: 500;
 }
@@ -122,7 +122,7 @@ function percent(opt: Option): number {
   font-size: 2.4rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: #fcd34d;
+  color: var(--ov-accent, #fcd34d);
   line-height: 1;
 }
 .gc-countdown .sec { font-size: 1.1rem; opacity: 0.7; margin-left: 2px; }
@@ -132,15 +132,15 @@ function percent(opt: Option): number {
 }
 .gc-locked-tag {
   font-size: 1.1rem;
-  color: #93c5fd;
+  color: var(--ov-accent, #93c5fd);
   font-weight: 600;
 }
 .gc-pool {
   font-size: 0.78rem;
-  color: #fde68a;
+  color: var(--ov-accent, #fde68a);
   margin-top: 4px;
 }
-.gc-pool strong { color: #fef3c7; }
+.gc-pool strong { color: var(--ov-text, #fef3c7); }
 
 .gc-bars { display: flex; flex-direction: column; gap: 8px; }
 .gc-bar { display: flex; flex-direction: column; gap: 3px; }
@@ -155,14 +155,14 @@ function percent(opt: Option): number {
   min-width: 22px;
   text-align: center;
   background: rgba(251, 191, 36, 0.2);
-  color: #fcd34d;
+  color: var(--ov-accent, #fcd34d);
   font-weight: 600;
   border-radius: 4px;
   padding: 1px 6px;
   font-family: 'Consolas', monospace;
 }
-.gc-label { flex: 1; color: #fef3c7; }
-.gc-count { color: #fde68a; font-variant-numeric: tabular-nums; }
+.gc-label { flex: 1; color: var(--ov-text, #fef3c7); }
+.gc-count { color: var(--ov-accent, #fde68a); font-variant-numeric: tabular-nums; }
 
 .gc-bar-track {
   height: 11px;
@@ -172,7 +172,7 @@ function percent(opt: Option): number {
 }
 .gc-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #d97706, #fbbf24);
+  background: linear-gradient(90deg, var(--ov-accent), var(--ov-accent-2));
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
 }
@@ -180,17 +180,17 @@ function percent(opt: Option): number {
 .gc-hint {
   margin-top: 0.9rem;
   font-size: 0.74rem;
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
   text-align: center;
 }
 .gc-hint code {
   background: rgba(0, 0, 0, 0.4);
   padding: 1px 5px;
   border-radius: 3px;
-  color: #fde68a;
+  color: var(--ov-accent, #fde68a);
   font-family: 'Consolas', monospace;
 }
-.gc-hint-locked { color: #93c5fd; font-size: 0.85rem; font-weight: 500; }
+.gc-hint-locked { color: var(--ov-accent, #93c5fd); font-size: 0.85rem; font-weight: 500; }
 
 @keyframes gcIn {
   from { transform: translateY(-24px) scale(0.92); opacity: 0; }

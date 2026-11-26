@@ -44,7 +44,7 @@ const pct = computed(() => Math.round((props.item.pet.exp / PET_LEVEL_EXP) * 100
     radial-gradient(circle at 18% 20%, color-mix(in srgb, var(--accent), transparent 62%), transparent 36%),
     linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.9));
   padding: 18px;
-  color: #f8fafc;
+  color: var(--ov-text, #f8fafc);
   box-shadow: 0 18px 54px rgba(0, 0, 0, 0.56), 0 0 30px color-mix(in srgb, var(--accent), transparent 62%);
   animation: cardIn 0.42s cubic-bezier(0.2, 0.75, 0.2, 1.15) both;
 }
@@ -93,7 +93,7 @@ const pct = computed(() => Math.round((props.item.pet.exp / PET_LEVEL_EXP) * 100
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #cbd5e1;
+  color: var(--ov-muted, #cbd5e1);
   font-size: 12px;
 }
 .pet-progress {
@@ -110,7 +110,7 @@ const pct = computed(() => Math.round((props.item.pet.exp / PET_LEVEL_EXP) * 100
 }
 .pet-level {
   margin-top: 5px;
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
 }

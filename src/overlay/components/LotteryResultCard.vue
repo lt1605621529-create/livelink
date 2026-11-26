@@ -53,7 +53,7 @@ const MEDALS = ['🥇', '🥈', '🥉']
   border-radius: 1.2rem;
   background: linear-gradient(135deg, rgba(6, 95, 70, 0.92), rgba(15, 23, 42, 0.92));
   padding: 1.6rem 2rem;
-  color: #d1fae5;
+  color: var(--ov-text, #d1fae5);
   border: 1px solid rgba(52, 211, 153, 0.6);
   box-shadow:
     0 20px 60px -10px rgba(0, 0, 0, 0.7),
@@ -70,17 +70,17 @@ const MEDALS = ['🥇', '🥈', '🥉']
 .title {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #34d399;
+  color: var(--ov-accent, #34d399);
 }
 .prize {
   font-size: 0.95rem;
-  color: #d1fae5;
+  color: var(--ov-text, #d1fae5);
 }
 .empty {
   text-align: center;
   padding: 1.5rem;
   font-size: 0.95rem;
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
 }
 .winner-list {
   list-style: none;
@@ -103,13 +103,13 @@ const MEDALS = ['🥇', '🥈', '🥉']
 .uname {
   font-size: 1.15rem;
   font-weight: 600;
-  color: #fef3c7;
+  color: var(--ov-text, #fef3c7);
 }
 .footer {
   margin-top: 0.9rem;
   text-align: right;
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
 }
 
 @keyframes resultIn {

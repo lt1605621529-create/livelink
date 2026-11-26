@@ -58,7 +58,7 @@ const tier = computed<Tier>(() => {
   border-radius: 12px;
   padding: 0;
   overflow: hidden;
-  color: #fff;
+  color: var(--ov-text, #fff);
   box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6);
 }
 
@@ -125,16 +125,16 @@ const tier = computed<Tier>(() => {
 /* ── epic：金色 + 持续脉冲 ── */
 .sc-epic .sc-card {
   background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #422006;
+  color: var(--ov-text, #422006);
   border: 1.5px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 0 36px rgba(251, 191, 36, 0.65), 0 16px 40px -10px rgba(0, 0, 0, 0.6);
   animation: epicPulse 1.6s ease-in-out infinite;
 }
 .sc-epic .sc-message {
   background: rgba(120, 53, 15, 0.4);
-  color: #fef3c7;
+  color: var(--ov-text, #fef3c7);
 }
-.sc-epic .sc-tag { color: #78350f; }
+.sc-epic .sc-tag { color: var(--ov-accent, #78350f); }
 @keyframes epicPulse {
   0%, 100% { transform: scale(1); box-shadow: 0 0 36px rgba(251, 191, 36, 0.65), 0 16px 40px -10px rgba(0, 0, 0, 0.6); }
   50% { transform: scale(1.015); box-shadow: 0 0 54px rgba(252, 211, 77, 0.85), 0 16px 40px -10px rgba(0, 0, 0, 0.6); }

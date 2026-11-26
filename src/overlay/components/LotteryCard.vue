@@ -63,7 +63,7 @@ watch(
   border-radius: 1rem;
   background: linear-gradient(135deg, rgba(120, 53, 15, 0.92), rgba(15, 23, 42, 0.88));
   padding: 1.4rem 1.6rem;
-  color: #fef3c7;
+  color: var(--ov-text, #fef3c7);
   box-shadow:
     0 20px 60px -10px rgba(0, 0, 0, 0.7),
     0 0 32px 4px rgba(251, 191, 36, 0.35);
@@ -78,23 +78,23 @@ watch(
 .badge {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #fcd34d;
+  color: var(--ov-accent, #fcd34d);
 }
 .keyword {
   font-size: 0.78rem;
-  color: #fde68a;
+  color: var(--ov-accent, #fde68a);
 }
 .keyword code {
   background: rgba(0, 0, 0, 0.35);
   padding: 1px 6px;
   border-radius: 4px;
-  color: #fff;
+  color: var(--ov-text, #fff);
   font-family: 'Consolas', monospace;
 }
 .prize {
   font-size: 1.05rem;
   font-weight: 500;
-  color: #fef3c7;
+  color: var(--ov-text, #fef3c7);
   margin-bottom: 0.6rem;
 }
 .countdown-row {
@@ -105,7 +105,7 @@ watch(
 .countdown {
   font-size: 3.6rem;
   font-weight: 700;
-  color: #fcd34d;
+  color: var(--ov-accent, #fcd34d);
   font-variant-numeric: tabular-nums;
   line-height: 1;
   text-shadow: 0 0 20px rgba(252, 211, 77, 0.6);
@@ -124,9 +124,9 @@ watch(
 }
 .winner-count, .participant {
   font-size: 0.95rem;
-  color: #fde68a;
+  color: var(--ov-accent, #fde68a);
 }
-.participant strong, .winner-count strong { color: #fcd34d; font-size: 1.3em; }
+.participant strong, .winner-count strong { color: var(--ov-accent, #fcd34d); font-size: 1.3em; }
 .participant {
   animation: countPulse 0.4s ease-out;
 }
@@ -140,8 +140,8 @@ watch(
   to   { transform: scale(1.08); }
 }
 @keyframes countPulse {
-  0%   { transform: scale(1); color: #fcd34d; }
-  50%  { transform: scale(1.15); color: #fef3c7; }
-  100% { transform: scale(1); color: #fde68a; }
+  0%   { transform: scale(1); color: var(--ov-accent, #fcd34d); }
+  50%  { transform: scale(1.15); color: var(--ov-text, #fef3c7); }
+  100% { transform: scale(1); color: var(--ov-accent, #fde68a); }
 }
 </style>

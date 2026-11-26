@@ -95,6 +95,7 @@ export interface DanmuBoardPosition {
 
 /** 给观众看的 OBS 弹幕信息板设置。 */
 export interface DanmuBoardConfig extends DanmuAppearanceConfig {
+  followTheme: boolean
   enabled: boolean
   position: DanmuBoardPosition
   maxLines: number
@@ -164,6 +165,7 @@ export const DEFAULT_DANMU_OVERLAY_SETTINGS: Readonly<DanmuOverlaySettings> = {
 export const DEFAULT_DANMU_BOARD_CONFIG: Readonly<DanmuBoardConfig> = {
   ...DEFAULT_DANMU_APPEARANCE,
   // 与升级前 OBS 弹幕板的静态 CSS 保持接近，老用户未调参时不会突然换风格。
+  followTheme: false,
   fontFamily: 'sans',
   textColor: '#e2e8f0',
   usernameColor: '#93c5fd',
@@ -503,6 +505,7 @@ function normalizeBoardRecord(
 ): DanmuBoardConfig {
   return {
     ...normalizeAppearanceRecord(source, fallback),
+    followTheme: normalizeBoolean(source.followTheme, fallback.followTheme),
     enabled: normalizeBoolean(source.enabled, fallback.enabled),
     position: normalizeDanmuBoardPosition(source.position, fallback.position),
     maxLines: clampInteger(

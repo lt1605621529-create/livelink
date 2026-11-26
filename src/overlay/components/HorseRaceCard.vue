@@ -118,7 +118,7 @@ function positionOf(h: Horse): number {
   border-radius: 16px;
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(120, 53, 15, 0.85));
   padding: 1.3rem 1.5rem;
-  color: #fef3c7;
+  color: var(--ov-text, #fef3c7);
   border: 1px solid rgba(251, 191, 36, 0.45);
   box-shadow: 0 18px 50px -10px rgba(0, 0, 0, 0.7), 0 0 28px rgba(251, 191, 36, 0.3);
 }
@@ -131,16 +131,16 @@ function positionOf(h: Horse): number {
 .hr-badge {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #fcd34d;
+  color: var(--ov-accent, #fcd34d);
 }
 .hr-badge-racing {
-  color: #7dd3fc;
+  color: var(--ov-accent, #7dd3fc);
 }
 .hr-countdown {
   font-size: 1.8rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: #fcd34d;
+  color: var(--ov-accent, #fcd34d);
   line-height: 1;
 }
 .hr-countdown.urgent {
@@ -148,22 +148,22 @@ function positionOf(h: Horse): number {
   animation: urgentPulse 0.6s ease-in-out infinite alternate;
 }
 .hr-finish {
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
   font-size: 0.85rem;
 }
 .hr-pool {
   font-size: 0.85rem;
-  color: #fde68a;
+  color: var(--ov-accent, #fde68a);
   margin: 0.1rem 0 0.45rem;
 }
 .hr-pool strong {
-  color: #fcd34d;
+  color: var(--ov-accent, #fcd34d);
   font-size: 1rem;
   font-variant-numeric: tabular-nums;
 }
 .hr-hint {
   font-size: 0.78rem;
-  color: #fde68a;
+  color: var(--ov-accent, #fde68a);
   margin-bottom: 0.7rem;
 }
 .hr-hint code {
@@ -196,14 +196,14 @@ function positionOf(h: Horse): number {
 }
 .hr-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #d97706, #fbbf24);
+  background: linear-gradient(90deg, var(--ov-accent), var(--ov-accent-2));
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
 }
 .hr-emoji { font-size: 1.4rem; }
 .hr-key {
   background: rgba(251, 191, 36, 0.2);
-  color: #fcd34d;
+  color: var(--ov-accent, #fcd34d);
   font-family: 'Consolas', monospace;
   font-weight: 600;
   padding: 0 6px;
@@ -211,13 +211,13 @@ function positionOf(h: Horse): number {
   min-width: 24px;
   text-align: center;
 }
-.hr-name { flex: 1; color: #fef3c7; font-size: 0.95rem; }
+.hr-name { flex: 1; color: var(--ov-text, #fef3c7); font-size: 0.95rem; }
 .hr-count {
-  color: #fde68a;
+  color: var(--ov-accent, #fde68a);
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
 }
-.hr-count strong { color: #fcd34d; font-weight: 700; }
+.hr-count strong { color: var(--ov-accent, #fcd34d); font-weight: 700; }
 
 /* racing 赛道 */
 .hr-tracks { display: flex; flex-direction: column; gap: 8px; }
@@ -247,18 +247,18 @@ function positionOf(h: Horse): number {
   gap: 8px;
   align-items: center;
   font-size: 0.7rem;
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
 }
 .hr-key-small {
   font-family: 'Consolas', monospace;
   background: rgba(56, 189, 248, 0.18);
-  color: #7dd3fc;
+  color: var(--ov-accent, #7dd3fc);
   padding: 0 5px;
   border-radius: 3px;
   font-weight: 600;
 }
-.hr-name-small { flex: 1; color: #cbd5e1; }
-.hr-count-small { color: #94a3b8; }
+.hr-name-small { flex: 1; color: var(--ov-muted, #cbd5e1); }
+.hr-count-small { color: var(--ov-muted, #94a3b8); }
 
 @keyframes hrIn {
   from { transform: translateY(-24px) scale(0.92); opacity: 0; }

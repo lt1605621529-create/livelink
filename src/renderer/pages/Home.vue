@@ -34,6 +34,15 @@ import DanmuStyleControls from '../components/DanmuStyleControls.vue'
 // 预览框 16:9 比例的拖动逻辑。容器尺寸 onmounted 测量
 const previewRef = ref<HTMLDivElement | null>(null)
 const dragging = ref(false)
+const showThemePreview = ref(false)
+const themePreviewUrl = computed(() => {
+  if (!overlayUrl.value) return ''
+  // This URL is derived from the locally started OBS server.
+  const url = new URL(overlayUrl.value)
+  if (!url.port || url.port === '0') return ''
+  url.searchParams.set('theme-preview', '1')
+  return url.toString()
+})
 
 // 假设直播画布 1920×1080。预览框里板子缩略图的宽/高占比 = 真实尺寸 / 画布尺寸
 const boardWidthPct = computed(() =>
@@ -337,6 +346,20 @@ async function copyOverlayUrl(): Promise<void> {
           影响 OBS 画面里的欢迎、礼物、小游戏卡片和宠物栏。切换后 OBS 浏览器源实时同步。
         </p>
       </div>
+      <div class="mt-3 flex flex-wrap items-center gap-4">
+        <label class="flex items-center gap-2 text-sm text-slate-300">
+          <input type="checkbox" :checked="danmuBoard.followTheme"
+            @change="patchDanmuBoard({ followTheme: ($event.target as HTMLInputElement).checked })" />
+          弹幕信息板跟随全局主题
+        </label>
+        <button class="rounded border border-slate-600 px-3 py-1 text-sm text-sky-300"
+          :disabled="!themePreviewUrl" :aria-expanded="showThemePreview"
+          @click="showThemePreview = !showThemePreview">
+          {{ showThemePreview ? '关闭 OBS 主题预览' : '打开 OBS 主题预览' }}
+        </button>
+      </div>
+      <iframe v-if="showThemePreview && themePreviewUrl" :src="themePreviewUrl"
+        title="OBS 观众端主题预览" class="mt-4 h-[420px] w-full rounded-lg border border-slate-700" />
       <div class="mt-4 grid gap-3 md:grid-cols-2">
         <button
           v-for="theme in OVERLAY_THEME_PRESETS"

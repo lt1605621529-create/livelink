@@ -68,7 +68,7 @@ function countOf(opt: Option): number {
   border-radius: 16px;
   background: linear-gradient(135deg, rgba(6, 95, 70, 0.94), rgba(15, 23, 42, 0.92));
   padding: 1.4rem 1.6rem;
-  color: #d1fae5;
+  color: var(--ov-text, #d1fae5);
   border: 1px solid rgba(52, 211, 153, 0.6);
   box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.7), 0 0 36px rgba(52, 211, 153, 0.35);
 }
@@ -83,12 +83,12 @@ function countOf(opt: Option): number {
 .vrc-title-tag {
   font-size: 1rem;
   font-weight: 700;
-  color: #34d399;
+  color: var(--ov-accent, #34d399);
 }
 .vrc-title {
   font-size: 1.15rem;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--ov-text, #f1f5f9);
   margin-bottom: 1rem;
   word-break: break-word;
 }
@@ -111,14 +111,14 @@ function countOf(opt: Option): number {
   min-width: 22px;
   text-align: center;
   background: rgba(0, 0, 0, 0.3);
-  color: #a7f3d0;
+  color: var(--ov-accent, #a7f3d0);
   border-radius: 4px;
   padding: 1px 6px;
   font-family: 'Consolas', monospace;
 }
-.vrc-label { flex: 1; color: #f1f5f9; }
-.vrc-medal { color: #fcd34d; margin-left: 4px; }
-.vrc-count { color: #94a3b8; font-variant-numeric: tabular-nums; }
+.vrc-label { flex: 1; color: var(--ov-text, #f1f5f9); }
+.vrc-medal { color: var(--ov-accent, #fcd34d); margin-left: 4px; }
+.vrc-count { color: var(--ov-muted, #94a3b8); font-variant-numeric: tabular-nums; }
 
 .vrc-bar-track {
   height: 12px;
@@ -132,7 +132,7 @@ function countOf(opt: Option): number {
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .vrc-win .vrc-bar-fill {
-  background: linear-gradient(90deg, #10b981, #34d399);
+  background: linear-gradient(90deg, var(--ov-accent), var(--ov-accent-2));
   box-shadow: 0 0 14px rgba(52, 211, 153, 0.65);
 }
 .vrc-win { transform: scale(1.02); }
@@ -141,7 +141,7 @@ function countOf(opt: Option): number {
   margin-top: 0.9rem;
   text-align: right;
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
 }
 
 @keyframes vrcIn {

@@ -90,7 +90,7 @@ const moreWinners = computed(() => Math.max(0, props.winners.length - topWinners
   border-radius: 16px;
   background: linear-gradient(135deg, rgba(120, 53, 15, 0.95), rgba(15, 23, 42, 0.95));
   padding: 1.4rem 1.6rem;
-  color: #fef3c7;
+  color: var(--ov-text, #fef3c7);
   border: 1px solid rgba(252, 211, 77, 0.55);
   box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.7), 0 0 50px rgba(252, 211, 77, 0.4);
 }
@@ -106,11 +106,11 @@ const moreWinners = computed(() => Math.max(0, props.winners.length - topWinners
 .hrr-title {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #fcd34d;
+  color: var(--ov-accent, #fcd34d);
 }
 .hrr-pool {
   font-size: 0.78rem;
-  color: #fde68a;
+  color: var(--ov-accent, #fde68a);
   font-variant-numeric: tabular-nums;
 }
 
@@ -134,29 +134,29 @@ const moreWinners = computed(() => Math.max(0, props.winners.length - topWinners
   font-weight: 700;
   min-width: 32px;
   text-align: center;
-  color: #fde68a;
+  color: var(--ov-accent, #fde68a);
 }
 .hrr-emoji { font-size: 1.5rem; }
-.hrr-name { flex: 1; font-size: 1.05rem; color: #fef3c7; }
-.hrr-pos { color: #94a3b8; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.hrr-name { flex: 1; font-size: 1.05rem; color: var(--ov-text, #fef3c7); }
+.hrr-pos { color: var(--ov-muted, #94a3b8); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
 
 .hrr-win {
   background: linear-gradient(135deg, rgba(252, 211, 77, 0.3), rgba(245, 158, 11, 0.2));
   border: 1px solid rgba(252, 211, 77, 0.4);
   transform: scale(1.02);
 }
-.hrr-win .hrr-name { color: #fff; font-weight: 600; }
+.hrr-win .hrr-name { color: var(--ov-text, #fff); font-weight: 600; }
 
 .hrr-bettors {
   background: rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   padding: 8px 12px;
 }
-.hrr-bettors-title { font-size: 0.78rem; color: #94a3b8; margin-bottom: 5px; }
+.hrr-bettors-title { font-size: 0.78rem; color: var(--ov-muted, #94a3b8); margin-bottom: 5px; }
 .hrr-bettors-list { display: flex; flex-wrap: wrap; gap: 5px; }
 .hrr-bettor {
   background: rgba(252, 211, 77, 0.2);
-  color: #fde68a;
+  color: var(--ov-accent, #fde68a);
   padding: 2px 9px;
   border-radius: 999px;
   font-size: 0.78rem;
@@ -164,7 +164,7 @@ const moreWinners = computed(() => Math.max(0, props.winners.length - topWinners
 .hrr-bettors-empty {
   text-align: center;
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
   padding: 6px;
 }
 
@@ -178,7 +178,7 @@ const moreWinners = computed(() => Math.max(0, props.winners.length - topWinners
 }
 .hrr-winners-title {
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
   margin-bottom: 2px;
 }
 .hrr-winner {
@@ -188,15 +188,15 @@ const moreWinners = computed(() => Math.max(0, props.winners.length - topWinners
   font-size: 0.85rem;
   padding: 2px 0;
 }
-.hrr-winner-name { color: #fef3c7; }
+.hrr-winner-name { color: var(--ov-text, #fef3c7); }
 .hrr-winner-payout {
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
   font-variant-numeric: tabular-nums;
 }
-.hrr-winner-payout strong { color: #34d399; font-weight: 700; }
+.hrr-winner-payout strong { color: var(--ov-accent, #34d399); font-weight: 700; }
 .hrr-winners-more {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
   text-align: right;
   margin-top: 2px;
 }

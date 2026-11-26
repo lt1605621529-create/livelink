@@ -39,7 +39,9 @@
     "verify:rule-persistence": "esbuild scripts/verify-rule-persistence.ts --bundle --platform=node --format=cjs --external:electron --outfile=node_modules/.cache/verify-rule-persistence.cjs --log-level=warning && electron node_modules/.cache/verify-rule-persistence.cjs",
     "verify:rule-overlay": "esbuild scripts/verify-rule-overlay.ts --bundle --platform=node --format=cjs --external:electron --outfile=node_modules/.cache/verify-rule-overlay.cjs --log-level=warning && electron node_modules/.cache/verify-rule-overlay.cjs",
     "verify:ai-dto": "esbuild scripts/verify-ai-ipc-dto.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/verify-ai-ipc-dto.cjs --log-level=warning && node node_modules/.cache/verify-ai-ipc-dto.cjs",
-    "verify:ai-ipc": "node scripts/verify-ai-ipc.cjs"
+    "verify:ai-ipc": "node scripts/verify-ai-ipc.cjs",
+    "verify:tts-volume": "esbuild scripts/verify-tts-volume.ts --bundle --platform=node --format=cjs --external:electron --outfile=node_modules/.cache/verify-tts-volume.cjs --log-level=warning && electron node_modules/.cache/verify-tts-volume.cjs",
+    "verify:obs-theme": "esbuild scripts/verify-obs-theme.ts --bundle --platform=node --format=cjs --external:electron --outfile=node_modules/.cache/verify-obs-theme.cjs --log-level=warning && electron node_modules/.cache/verify-obs-theme.cjs"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",

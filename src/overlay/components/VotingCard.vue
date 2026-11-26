@@ -71,7 +71,7 @@ function countOf(opt: Option): number {
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(7, 89, 133, 0.78));
   padding: 1.2rem 1.4rem;
-  color: #e0f2fe;
+  color: var(--ov-text, #e0f2fe);
   border: 1px solid rgba(56, 189, 248, 0.5);
   box-shadow: 0 16px 50px -10px rgba(0, 0, 0, 0.65), 0 0 30px rgba(56, 189, 248, 0.25);
 }
@@ -84,13 +84,13 @@ function countOf(opt: Option): number {
 .vc-badge {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #7dd3fc;
+  color: var(--ov-accent, #7dd3fc);
 }
 .vc-countdown {
   font-size: 1.8rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: #7dd3fc;
+  color: var(--ov-accent, #7dd3fc);
   line-height: 1;
 }
 .vc-countdown.urgent {
@@ -100,7 +100,7 @@ function countOf(opt: Option): number {
 .vc-title {
   font-size: 1.15rem;
   font-weight: 500;
-  color: #f1f5f9;
+  color: var(--ov-text, #f1f5f9);
   margin-bottom: 1rem;
   word-break: break-word;
 }
@@ -126,14 +126,14 @@ function countOf(opt: Option): number {
   min-width: 22px;
   text-align: center;
   background: rgba(56, 189, 248, 0.25);
-  color: #bae6fd;
+  color: var(--ov-accent, #bae6fd);
   font-weight: 600;
   border-radius: 4px;
   padding: 1px 6px;
   font-family: 'Consolas', monospace;
 }
-.vc-label { flex: 1; color: #f1f5f9; }
-.vc-count { color: #cbd5e1; font-variant-numeric: tabular-nums; }
+.vc-label { flex: 1; color: var(--ov-text, #f1f5f9); }
+.vc-count { color: var(--ov-muted, #cbd5e1); font-variant-numeric: tabular-nums; }
 
 .vc-bar-track {
   height: 12px;
@@ -143,7 +143,7 @@ function countOf(opt: Option): number {
 }
 .vc-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+  background: linear-gradient(90deg, var(--ov-accent), var(--ov-accent-2));
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
 }
@@ -152,15 +152,15 @@ function countOf(opt: Option): number {
   margin-top: 0.9rem;
   text-align: center;
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: var(--ov-muted, #94a3b8);
 }
 .vc-footer code {
   background: rgba(0, 0, 0, 0.4);
   padding: 1px 5px;
   border-radius: 3px;
-  color: #bae6fd;
+  color: var(--ov-accent, #bae6fd);
 }
-.vc-footer strong { color: #f1f5f9; }
+.vc-footer strong { color: var(--ov-text, #f1f5f9); }
 
 @keyframes vcIn {
   from { transform: translateY(-24px) scale(0.92); opacity: 0; }

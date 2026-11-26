@@ -66,7 +66,7 @@ const showImg = computed(() => props.giftId != null && !imgFailed.value)
   border-radius: 1rem;
   background: rgba(0, 0, 0, 0.55);
   padding: 0.6rem 1.1rem;
-  color: white;
+  color: var(--ov-text, white);
   box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(8px);
   transform-origin: right center;
@@ -89,13 +89,13 @@ const showImg = computed(() => props.giftId != null && !imgFailed.value)
 }
 .uname {
   font-size: 0.85rem;
-  color: #fcd34d;
+  color: var(--ov-accent, #fcd34d);
 }
 .line {
   font-size: 1rem;
   font-weight: 500;
 }
-.num { color: #fcd34d; }
+.num { color: var(--ov-accent, #fcd34d); }
 
 /* normal: 飞入 + 抖动 + 飞出（原版动效） */
 .gift-tier-normal .gift-card {
